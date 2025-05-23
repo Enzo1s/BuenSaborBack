@@ -2,9 +2,6 @@ package com.buenSabor.model;
 
 import java.time.LocalDate;
 
-
-import com.buenSabor.enums.Rol;
-
 import lombok.Data;
 
 @Data
@@ -21,8 +18,6 @@ public class EmpleadoModel {
 	private String email;
 	
 	private UsuarioModel usuario;
-
-	private Rol perfil;
 	
     private LocalDate modificacion;
     

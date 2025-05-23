@@ -1,69 +1,77 @@
 package com.buenSabor.jwt;
 
-import org.jose4j.jws.AlgorithmIdentifiers;
-import org.jose4j.jws.JsonWebSignature;
-import org.jose4j.jwt.JwtClaims;
-import org.jose4j.jwt.MalformedClaimException;
-import org.jose4j.jwt.NumericDate;
-import org.jose4j.jwt.consumer.InvalidJwtException;
-import org.jose4j.jwt.consumer.JwtConsumer;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
-import org.jose4j.keys.HmacKey;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.util.Map;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.JWTVerifier;
+import com.buenSabor.dto.LoginDTO;
+import com.buenSabor.entity.Usuario;
+import com.buenSabor.model.UsuarioModel;
+import com.buenSabor.repository.UsuarioRepository;
+
+import java.time.Instant;
+import java.util.Date;
 
 @Component
 public class JWTUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(JWTUtil.class);
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private static String secret = "secreto";
+    
+    private static final Algorithm ALG = Algorithm.HMAC256(secret);
+	private static final String ISS = "BuenSabor";
+	
+	private final Log log = LogFactory.getLog(JWTUtil.class);
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    @Value("${jwt.expiration}")
-    private long expiration; // en milisegundos
-
-    public String generateToken(String subject, Map<String, Object> claims) {
+    public String generateToken(LoginDTO model) throws Exception {
+    	Usuario usuario = usuarioRepository.findByUsername(model.username());
+    	
         try {
-            SecretKey secretKey = new HmacKey(secret.getBytes("UTF-8"));
+        	checkPass(usuario, model.password());
+        	return JWT.create()
+        			.withIssuer(ISS)
+        			.withIssuedAt(new Date())
+					.withExpiresAt(Instant.now().plusSeconds(3600))
+					.withClaim("username", usuario.getUsername())
+					.withClaim("sucursal", usuario.getSucursalEmpresa().getNombre())
+					.sign(ALG);
 
-            JwtClaims jwtClaims = new JwtClaims();
-            jwtClaims.setSubject(subject);
-            jwtClaims.setIssuedAtToNow();
-            jwtClaims.setExpirationTime( NumericDate.fromSeconds(expiration));
-            claims.forEach(jwtClaims::setClaim);
-
-            JsonWebSignature jws = new JsonWebSignature();
-            jws.setPayload(jwtClaims.toJson());
-            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
-            jws.setKey(secretKey);
-
-            return jws.getCompactSerialization();
-        } catch (Exception e) {
-            logger.error("Error al generar el token JWT: {}", e.getMessage());
-            return null;
+        } catch (JWTCreationException e) {
+			log.error(e);
+		} catch (NullPointerException e) {
+			log.info("Usuario <" + model.username() + "> no encontrado");
+			return "Credenciales inválidas";
         }
+		return null;
     }
 
+    private void checkPass(Usuario usuario, String password) throws Exception {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		if (!encoder.matches(password, usuario.getPassword())) {
+			throw new Exception("Contraseña incorrecta");
+		}
+	}
+    
     public boolean validateToken(String token) {
         try {
-            SecretKey secretKey = new HmacKey(secret.getBytes("UTF-8"));
-
-            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
-                    .setRequireExpirationTime()
-                    .setAllowedClockSkewInSeconds(30)
-                    .setExpectedIssuer(null) 
-                    .setVerificationKey(secretKey)
-                    .build();
-
-            jwtConsumer.processToClaims(token);
+            JWTVerifier verifier = JWT.require(ALG).withIssuer(ISS).build();
+            verifier.verify(token);
             return true;
-        } catch (InvalidJwtException e) {
+        } catch (IllegalArgumentException e) {
             logger.error("Token JWT inválido: {}", e.getMessage());
             return false;
         } catch (Exception e) {
@@ -71,43 +79,17 @@ public class JWTUtil {
             return false;
         }
     }
-
-    public String getSubjectFromToken(String token) {
-        try {
-            SecretKey secretKey = new HmacKey(secret.getBytes("UTF-8"));
-
-            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
-                    .setVerificationKey(secretKey)
-                    .build();
-
-            JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
-            return jwtClaims.getSubject();
-        } catch (InvalidJwtException | MalformedClaimException e) {
-            logger.error("Error al obtener el subject del token JWT: {}", e.getMessage());
-            return null;
-        } catch (Exception e) {
-            logger.error("Error al procesar el token JWT: {}", e.getMessage());
-            return null;
-        }
+    
+    public String obtenerUsername(String token) throws JWTDecodeException {
+    	if(token.contains("Bearer"))
+    		token = token.replaceAll("Bearer ", "");
+    	return JWT.decode(token).getClaim("username").asString();
+    }
+    
+    public Usuario obtenerUsuario(String token) throws JWTDecodeException {
+    	if(token.contains("Bearer")) 
+    		token = token.replaceAll("Bearer", "");
+    	return usuarioRepository.findByUsername(obtenerUsername(token));
     }
 
-    public <T> T getClaimFromToken(String token, String claimName, Class<T> claimType) {
-        try {
-            SecretKey secretKey = new HmacKey(secret.getBytes("UTF-8"));
-
-            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
-                    .setVerificationKey(secretKey)
-                    .build();
-
-            JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
-            return jwtClaims.getClaimValue(claimName, claimType);
-        } catch (InvalidJwtException | MalformedClaimException e) {
-            logger.error("Error al obtener la reclamación '{}' del token JWT: {}", claimName, e.getMessage());
-            return null;
-        } catch (Exception e) {
-            logger.error("Error al procesar el token JWT: {}", e.getMessage());
-            return null;
-        }
-    }
-	
 }

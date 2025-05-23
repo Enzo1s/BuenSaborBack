@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -16,6 +18,7 @@ public class SucursalInsumo implements Serializable {
 	private static final long serialVersionUID = -6989505172602048532L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	
 	private double stockActual;

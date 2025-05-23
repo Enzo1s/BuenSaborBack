@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.Data;
 
 @Data
@@ -15,6 +17,7 @@ public class DatosMercadoPago implements Serializable{
 
 	private static final long serialVersionUID = -8045116941495778953L;
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private LocalDate dateCreated;
 	private LocalDate dateApproved;

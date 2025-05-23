@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import com.buenSabor.enums.FormaPago;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
@@ -21,6 +23,7 @@ public class FacturaVenta implements Serializable {
 	private static final long serialVersionUID = 2319576343947923924L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	
 	private LocalDate fechaFacturacion;

@@ -12,6 +12,8 @@ import com.buenSabor.enums.FormaPago;
 import com.buenSabor.enums.TipoEnvio;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
@@ -23,6 +25,7 @@ public class PedidoVenta implements Serializable {
 	private static final long serialVersionUID = -4491802905747841818L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 
 	private LocalDate horaEstimadaFinalizacion;

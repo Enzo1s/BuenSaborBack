@@ -30,6 +30,7 @@ public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends 
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<M> findAll(Pageable pageable) {
 		Page<E> objs = repository.findAll(pageable);
 		return new PageImpl<>(
@@ -38,6 +39,7 @@ public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends 
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public M findById(String id) {
 		Optional<E> obj = repository.findById(id);
 		if (obj.isPresent())
@@ -46,6 +48,7 @@ public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends 
 	}
 
 	@Override
+	@Transactional
 	public M save(M model) {
 		E entity = converter.modeloReqToEntidad(model);
 		E obj = repository.save(entity);
@@ -53,6 +56,7 @@ public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends 
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(String id) {
 		repository.deleteById(id);
 

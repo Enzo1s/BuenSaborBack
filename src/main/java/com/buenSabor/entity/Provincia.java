@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -16,6 +18,7 @@ public class Provincia implements Serializable {
 	private static final long serialVersionUID = 8469387955421214547L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	
 	private String nombre;

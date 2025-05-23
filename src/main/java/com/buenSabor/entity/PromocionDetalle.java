@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -16,6 +18,7 @@ public class PromocionDetalle implements Serializable {
 	private static final long serialVersionUID = -7894130956289868487L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String  id;
 	
 	private int cantidad;

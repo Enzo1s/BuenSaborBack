@@ -17,7 +17,9 @@ public class UsuarioConverter extends CommonConverter<UsuarioModel, Usuario> {
 
 	@Override
 	public UsuarioModel entidadToModeloRes(Usuario e) {
-		return ConverterUtil.map(e, UsuarioModel.class);
+		UsuarioModel usuario = ConverterUtil.map(e, UsuarioModel.class);
+		usuario.setPassword(null);
+		return usuario;
 	}
 
 }

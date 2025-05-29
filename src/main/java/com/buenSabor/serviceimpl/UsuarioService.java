@@ -27,7 +27,7 @@ CommonConverter<UsuarioModel,Usuario>, CommonRepository<Usuario,String>>{
 		entidad.setPassword(new BCryptPasswordEncoder().encode(usuario.getPassword()));
 		try {
 			repository.save(entidad);
-			LoginDTO loginDto = new LoginDTO(entidad.getUsername(), entidad.getPassword());
+			LoginDTO loginDto = new LoginDTO(entidad.getUsername(), usuario.getPassword());
 			return jwtUtil.generateToken(loginDto);
 		}catch (Exception e) {
 			throw new Exception(e.getMessage());

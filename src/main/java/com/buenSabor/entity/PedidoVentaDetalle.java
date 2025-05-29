@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,11 +26,11 @@ public class PedidoVentaDetalle implements Serializable{
 	
 	private double subTotal;
 	
-	@OneToMany
-	private List<ArticuloManufacturado> articuloManufacturado;
+	@ManyToOne
+	private ArticuloManufacturado articuloManufacturado;
 	
-	@OneToMany
-	private List<ArticuloInsumo> articuloInsumo;
+	@ManyToOne
+	private ArticuloInsumo articuloInsumo;
 	
 	@OneToMany
 	private List<Promocion> promocion;

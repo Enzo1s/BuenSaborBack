@@ -9,7 +9,6 @@ import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.commonservice.CommonServiceImpl;
 import com.buenSabor.commonsrepository.CommonRepository;
 import com.buenSabor.entity.ArticuloManufacturado;
-import com.buenSabor.entity.ArticuloManufacturadoDetalle;
 import com.buenSabor.model.ArticuloManufacturadoModel;
 import com.buenSabor.utils.GuardarArchivos;
 
@@ -29,12 +28,6 @@ CommonConverter<ArticuloManufacturadoModel,ArticuloManufacturado>, CommonReposit
 		if(modelo.getPathImagen() != null && !modelo.getPathImagen().isEmpty()) {
 			entidad.setPathImagen(guardarArchivos.guardarImgenes(modelo.getPathImagen()));
 		}
-//		for(ArticuloManufacturadoDetalle detalle: entidad.getArticuloManufacturadoDetalle()) {
-//			if(detalle.getArticuloInsumo() != null && detalle.getArticuloInsumo().getId() != null && !detalle.getArticuloInsumo().getId().isEmpty() ) {
-//				
-//			}
-//		}
-		
 		entidad = repository.save(entidad);
 		
 		return converter.entidadToModeloRes(entidad);
@@ -43,4 +36,5 @@ CommonConverter<ArticuloManufacturadoModel,ArticuloManufacturado>, CommonReposit
 	public ResponseEntity<Resource> abrirArchivo(String archivo) {
 		return guardarArchivos.leerArchivo(archivo);
 	}
+
 }

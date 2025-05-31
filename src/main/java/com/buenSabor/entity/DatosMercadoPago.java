@@ -10,10 +10,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class DatosMercadoPago implements Serializable{
+public class DatosMercadoPago extends ABM implements Serializable{
 
 	private static final long serialVersionUID = -8045116941495778953L;
 	@Id
@@ -26,10 +28,5 @@ public class DatosMercadoPago implements Serializable{
 	private String paymentMethodId;
 	private String status;
 	private String statusDetail;
-	
-    private LocalDate modificacion;
-    
-    private LocalDate alta;
-    
-    private LocalDate baja;
+
 }

@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,6 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.buenSabor.dto.LoginDTO;
 import com.buenSabor.entity.Usuario;
-import com.buenSabor.model.UsuarioModel;
 import com.buenSabor.repository.UsuarioRepository;
 
 import java.time.Instant;

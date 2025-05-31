@@ -1,7 +1,6 @@
 package com.buenSabor.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 import com.buenSabor.enums.Rol;
 
@@ -14,10 +13,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class Usuario implements Serializable {
+public class Usuario extends ABM implements Serializable {
 
 	private static final long serialVersionUID = 480133828888674529L;
 
@@ -38,10 +39,5 @@ public class Usuario implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Rol rol;
 	
-    private LocalDate modificacion;
-    
-    private LocalDate alta;
-    
-    private LocalDate baja;
 
 }

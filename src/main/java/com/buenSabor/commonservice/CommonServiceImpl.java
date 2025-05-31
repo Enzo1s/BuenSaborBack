@@ -1,5 +1,6 @@
 package com.buenSabor.commonservice;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -11,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.commonsrepository.CommonRepository;
+import com.buenSabor.entity.ABM;
 
-public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends CommonRepository<E, String>>
+public class CommonServiceImpl<E extends ABM, M, P extends CommonConverter<M, E>, R extends CommonRepository<E , String>>
 		implements CommonService<M> {
 
 	@Autowired
@@ -58,8 +60,14 @@ public class CommonServiceImpl<E, M, P extends CommonConverter<M, E>, R extends 
 	@Override
 	@Transactional
 	public void deleteById(String id) {
-		repository.deleteById(id);
-
+		Optional<E> entity = repository.findById(id);
+		if(entity.isPresent()) {
+			System.out.print("ELIMINADO");
+			E obj = entity.get();
+			obj.setBaja(LocalDateTime.now());
+			obj = repository.save(obj);
+			System.out.print(obj);
+		}
 	}
 
 }

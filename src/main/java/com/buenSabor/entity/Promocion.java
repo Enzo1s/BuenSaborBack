@@ -11,10 +11,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class Promocion implements Serializable {
+public class Promocion extends ABM implements Serializable {
 
 	private static final long serialVersionUID = -4198850094515297632L;
 	
@@ -32,10 +34,5 @@ public class Promocion implements Serializable {
 	
 	@OneToMany
 	private List<PromocionDetalle> promocionDetalle;
-	
-	private LocalDate modificacion;
 
-	private LocalDate alta;
-
-	private LocalDate baja;
 }

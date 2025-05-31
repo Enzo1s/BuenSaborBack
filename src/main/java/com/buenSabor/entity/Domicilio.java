@@ -1,7 +1,6 @@
 package com.buenSabor.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 import jakarta.persistence.Id;
 
@@ -10,10 +9,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class Domicilio implements Serializable {
+public class Domicilio extends ABM implements Serializable {
 
 	private static final long serialVersionUID = -3690010076807792714L;
 	
@@ -26,10 +27,5 @@ public class Domicilio implements Serializable {
 	
 	@ManyToOne
 	private Localidad localidad;
-	
-    private LocalDate modificacion;
-    
-    private LocalDate alta;
-    
-    private LocalDate baja;
+
 }

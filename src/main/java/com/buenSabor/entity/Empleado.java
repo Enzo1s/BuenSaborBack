@@ -1,7 +1,6 @@
 package com.buenSabor.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 import jakarta.persistence.Id;
 
@@ -10,10 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Entity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class Empleado implements Serializable {
+public class Empleado extends ABM implements Serializable {
 
 	private static final long serialVersionUID = 575745642530075138L;
 
@@ -32,9 +33,4 @@ public class Empleado implements Serializable {
 	@OneToOne
 	private Usuario usuario;
 	
-    private LocalDate modificacion;
-    
-    private LocalDate alta;
-    
-    private LocalDate baja;
 }

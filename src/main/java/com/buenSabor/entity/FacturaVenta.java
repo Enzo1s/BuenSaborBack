@@ -15,10 +15,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class FacturaVenta implements Serializable {
+public class FacturaVenta extends ABM implements Serializable {
 
 	private static final long serialVersionUID = 2319576343947923924L;
 
@@ -46,10 +48,5 @@ public class FacturaVenta implements Serializable {
 	@OneToMany
 	private List<FacturaVentaDetalle> facturaVentaDetalle;
 	
-	private LocalDate modificacion;
-
-	private LocalDate alta;
-
-	private LocalDate baja;
 	
 }

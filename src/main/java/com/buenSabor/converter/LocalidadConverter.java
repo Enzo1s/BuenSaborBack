@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.Localidad;
 import com.buenSabor.model.LocalidadModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class LocalidadConverter extends CommonConverter<LocalidadModel, Localidad> {

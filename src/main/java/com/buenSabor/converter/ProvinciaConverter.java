@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.Provincia;
 import com.buenSabor.model.ProvinciaModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class ProvinciaConverter extends CommonConverter<ProvinciaModel, Provincia> {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.buenSabor.commonservice.CommonService;
@@ -44,6 +45,12 @@ public class CommonController<M, S extends CommonService<M>> {
 
 	@PostMapping("/create")
 	public ResponseEntity<?> create( @RequestBody M model) {
+		M entityDb = service.save(model);
+		return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
+	}
+	
+	@PutMapping("/update")
+	public ResponseEntity<?> update( @RequestBody M model) {
 		M entityDb = service.save(model);
 		return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
 	}

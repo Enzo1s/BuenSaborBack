@@ -56,6 +56,15 @@ public class CommonServiceImpl<E extends ABM, M, P extends CommonConverter<M, E>
 		E obj = repository.save(entity);
 		return converter.entidadToModeloRes(obj);
 	}
+	
+	@Override
+	@Transactional
+	public M update(M model) {
+		E entity = converter.modeloReqToEntidad(model);
+		entity.setModificacion(LocalDateTime.now());
+		E obj = repository.save(entity);
+		return converter.entidadToModeloRes(obj);
+	}
 
 	@Override
 	@Transactional

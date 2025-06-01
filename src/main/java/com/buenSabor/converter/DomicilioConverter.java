@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.Domicilio;
 import com.buenSabor.model.DomicilioModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class DomicilioConverter extends CommonConverter<DomicilioModel, Domicilio> {

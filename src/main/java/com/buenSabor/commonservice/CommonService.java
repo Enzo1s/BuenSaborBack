@@ -13,5 +13,7 @@ public interface CommonService<M> {
 	
 	public M save (M model);
 	
+	public M update (M model);
+	
 	public void deleteById (String id);
 }

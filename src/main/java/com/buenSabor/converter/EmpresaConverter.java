@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.Empresa;
 import com.buenSabor.model.EmpresaModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class EmpresaConverter extends CommonConverter<EmpresaModel, Empresa> {

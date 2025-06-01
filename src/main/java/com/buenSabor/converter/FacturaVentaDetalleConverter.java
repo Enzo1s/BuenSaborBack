@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.FacturaVentaDetalle;
 import com.buenSabor.model.FacturaVentaDetalleModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class FacturaVentaDetalleConverter extends CommonConverter<FacturaVentaDetalleModel, FacturaVentaDetalle> {

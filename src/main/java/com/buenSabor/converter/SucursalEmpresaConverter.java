@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.entity.SucursalEmpresa;
 import com.buenSabor.model.SucursalEmpresaModel;
-import com.buenSabor.utils.ConverterUtil;
 
 @Component
 public class SucursalEmpresaConverter extends CommonConverter<SucursalEmpresaModel, SucursalEmpresa> {

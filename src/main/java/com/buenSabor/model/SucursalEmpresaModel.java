@@ -10,7 +10,7 @@ public class SucursalEmpresaModel {
 	private String id;
 	private String nombre;
 	private String horarioApertura;
-	private String horarioCIerre;
+	private String horarioCierre;
 	
 	private DomicilioModel domicilio;
 	

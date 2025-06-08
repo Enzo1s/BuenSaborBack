@@ -3,7 +3,7 @@ package com.buenSabor.entity;
 import java.io.Serializable;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,9 +23,9 @@ public class SucursalEmpresa extends ABM implements Serializable{
 	private String id;
 	private String nombre;
 	private String horarioApertura;
-	private String horarioCIerre;
+	private String horarioCierre;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private Domicilio domicilio;
 	
 }

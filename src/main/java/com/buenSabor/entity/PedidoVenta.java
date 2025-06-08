@@ -11,6 +11,7 @@ import com.buenSabor.enums.Estado;
 import com.buenSabor.enums.FormaPago;
 import com.buenSabor.enums.TipoEnvio;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -44,7 +45,7 @@ public class PedidoVenta extends ABM implements Serializable {
 
 	private Estado estado;
 
-	private TipoEnvio tipoEnvpio;
+	private TipoEnvio tipoEnvio;
 
 	private FormaPago formaPago;
 	
@@ -60,7 +61,7 @@ public class PedidoVenta extends ABM implements Serializable {
 	@ManyToOne
 	private FacturaVenta factura;
 	
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PedidoVentaDetalle> pedidoVentaDetalle;
 
 	private LocalDate fechaPedido;

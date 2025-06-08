@@ -2,6 +2,7 @@ package com.buenSabor.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.buenSabor.enums.Estado;
 import com.buenSabor.enums.FormaPago;
@@ -28,7 +29,7 @@ public class PedidoVentaModel {
 
 	private Estado estado;
 
-	private TipoEnvio tipoEnvpio;
+	private TipoEnvio tipoEnvio;
 
 	private FormaPago formaPago;
 	
@@ -40,7 +41,7 @@ public class PedidoVentaModel {
 	
 	private FacturaVentaModel factura;
 	
-	private PedidoVentaDetalleModel pedidoVentaDetalle;
+	private List<PedidoVentaDetalleModel> pedidoVentaDetalle;
 
 	private LocalDate fechaPedido;
 

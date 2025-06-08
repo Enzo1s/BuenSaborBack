@@ -43,9 +43,9 @@ public class JWTUtil {
         	return JWT.create()
         			.withIssuer(ISS)
         			.withIssuedAt(new Date())
-					.withExpiresAt(Instant.now().plusSeconds(3600))
+					.withExpiresAt(Instant.now().plusSeconds(36000))
 					.withClaim("username", usuario.getUsername())
-					.withClaim("sucursal", usuario.getSucursalEmpresa().getNombre())
+					.withClaim("sucursal", usuario.getSucursalEmpresa() != null ? usuario.getSucursalEmpresa().getNombre():"")
 					.sign(ALG);
 
         } catch (JWTCreationException e) {
@@ -81,6 +81,7 @@ public class JWTUtil {
     public String obtenerUsername(String token) throws JWTDecodeException {
     	if(token.contains("Bearer"))
     		token = token.replaceAll("Bearer ", "");
+    	token = token.replace("\"", "");
     	return JWT.decode(token).getClaim("username").asString();
     }
     

@@ -8,7 +8,7 @@ import com.buenSabor.model.FacturaVentaModel;
 import com.buenSabor.serviceimpl.FacturaVentaService;
 
 @RestController
-@RequestMapping(path = "/fatura-venta")
+@RequestMapping(path = "/factura-venta")
 public class FacturaVentaRestController extends CommonController<FacturaVentaModel, FacturaVentaService>{
 
 }

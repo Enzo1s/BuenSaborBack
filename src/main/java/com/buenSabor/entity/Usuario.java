@@ -36,6 +36,9 @@ public class Usuario extends ABM implements Serializable {
 	@ManyToOne
 	private SucursalEmpresa sucursalEmpresa;
 	
+	@ManyToOne
+	private Empresa empresa;
+	
 	@Enumerated(EnumType.STRING)
 	private Rol rol;
 	

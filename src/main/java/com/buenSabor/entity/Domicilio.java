@@ -3,7 +3,7 @@ package com.buenSabor.entity;
 import java.io.Serializable;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +25,7 @@ public class Domicilio extends ABM implements Serializable {
 	private Integer numero;
 	private Integer cp;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Localidad localidad;
 
 }

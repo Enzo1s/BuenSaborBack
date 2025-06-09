@@ -13,6 +13,8 @@ public class SucursalInsumoModel {
 	private double stockMinimo;
 	private double stockMaximo;
 	
+	private ArticuloInsumoModel articuloInsumo;
+	
 	private SucursalEmpresaModel sucursalEmpresa;
 	
 	private LocalDate modificacion;

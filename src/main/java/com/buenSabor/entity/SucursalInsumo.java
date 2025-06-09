@@ -27,6 +27,9 @@ public class SucursalInsumo extends ABM implements Serializable {
 	private double stockMaximo;
 	
 	@ManyToOne
+	private ArticuloInsumo articuloInsumo;
+	
+	@ManyToOne
 	private SucursalEmpresa sucursalEmpresa;
 	
 

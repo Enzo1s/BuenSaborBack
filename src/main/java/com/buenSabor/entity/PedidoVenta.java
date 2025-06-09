@@ -2,7 +2,7 @@ package com.buenSabor.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Id;
@@ -31,7 +31,7 @@ public class PedidoVenta extends ABM implements Serializable {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 
-	private LocalDate horaEstimadaFinalizacion;
+	private LocalDateTime horaEstimadaFinalizacion;
 
 	private BigDecimal subtotal;
 
@@ -64,6 +64,6 @@ public class PedidoVenta extends ABM implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PedidoVentaDetalle> pedidoVentaDetalle;
 
-	private LocalDate fechaPedido;
+	private LocalDateTime fechaPedido;
 
 }

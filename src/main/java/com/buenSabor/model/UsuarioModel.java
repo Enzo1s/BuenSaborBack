@@ -1,6 +1,6 @@
 package com.buenSabor.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.buenSabor.entity.Empresa;
 import com.buenSabor.enums.Rol;
@@ -22,10 +22,10 @@ public class UsuarioModel {
 	
 	private EmpresaModel empresa;
 	
-    private LocalDate modificacion;
+    private LocalDateTime modificacion;
     
-    private LocalDate alta;
+    private LocalDateTime alta;
     
-    private LocalDate baja;
+    private LocalDateTime baja;
 
 }

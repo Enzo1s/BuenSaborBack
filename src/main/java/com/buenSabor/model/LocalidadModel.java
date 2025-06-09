@@ -1,6 +1,6 @@
 package com.buenSabor.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -12,10 +12,10 @@ public class LocalidadModel {
 	
 	private ProvinciaModel provincia;
 	
-    private Date modificacion;
+    private LocalDateTime modificacion;
     
-    private Date alta;
+    private LocalDateTime alta;
     
-    private Date baja;
+    private LocalDateTime baja;
 
 }

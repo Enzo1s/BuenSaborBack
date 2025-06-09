@@ -1,7 +1,7 @@
 package com.buenSabor.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.buenSabor.enums.FormaPago;
@@ -13,7 +13,7 @@ public class FacturaVentaModel {
 	
 	private String id;
 	
-	private LocalDate fechaFacturacion;
+	private LocalDateTime fechaFacturacion;
 	
 	private Long numeroComprobante;
 	
@@ -31,10 +31,10 @@ public class FacturaVentaModel {
 	
 	private List<FacturaVentaDetalleModel> facturaVentaDetalle;
 	
-	private LocalDate modificacion;
+	private LocalDateTime modificacion;
 
-	private LocalDate alta;
+	private LocalDateTime alta;
 
-	private LocalDate baja;
+	private LocalDateTime baja;
 	
 }

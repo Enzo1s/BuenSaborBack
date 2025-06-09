@@ -1,7 +1,7 @@
 package com.buenSabor.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Id;
@@ -26,9 +26,9 @@ public class Promocion extends ABM implements Serializable {
 	
 	private String denominacion;
 	
-	private LocalDate fechaDesde;
+	private LocalDateTime fechaDesde;
 	
-	private LocalDate fechaHasta;
+	private LocalDateTime fechaHasta;
 	
 	private double descuento;
 	

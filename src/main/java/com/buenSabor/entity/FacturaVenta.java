@@ -2,7 +2,7 @@ package com.buenSabor.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Id;
@@ -28,7 +28,7 @@ public class FacturaVenta extends ABM implements Serializable {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	
-	private LocalDate fechaFacturacion;
+	private LocalDateTime fechaFacturacion;
 	
 	private Long numeroComprobante;
 	

@@ -1,6 +1,7 @@
 package com.buenSabor.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -16,9 +17,9 @@ public class DatosMercadoPagoModel {
 	private String status;
 	private String statusDetail;
 	
-    private LocalDate modificacion;
+    private LocalDateTime modificacion;
     
-    private LocalDate alta;
+    private LocalDateTime alta;
     
-    private LocalDate baja;
+    private LocalDateTime baja;
 }

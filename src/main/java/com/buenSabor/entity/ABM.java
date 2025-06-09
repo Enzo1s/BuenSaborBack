@@ -18,8 +18,8 @@ public abstract class ABM {
 	@CreatedDate
 	private LocalDateTime alta;
 		
-	@LastModifiedDate
 	private LocalDateTime baja;
 	
+	@LastModifiedDate
 	private LocalDateTime modificacion;
 }

@@ -1,7 +1,7 @@
 package com.buenSabor.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.buenSabor.enums.Estado;
@@ -15,7 +15,7 @@ public class PedidoVentaModel {
 	
 	private String id;
 
-	private LocalDate horaEstimadaFinalizacion;
+	private LocalDateTime horaEstimadaFinalizacion;
 
 	private BigDecimal subtotal;
 
@@ -43,11 +43,11 @@ public class PedidoVentaModel {
 	
 	private List<PedidoVentaDetalleModel> pedidoVentaDetalle;
 
-	private LocalDate fechaPedido;
+	private LocalDateTime fechaPedido;
 
-	private LocalDate modificacion;
+	private LocalDateTime modificacion;
 
-	private LocalDate alta;
+	private LocalDateTime alta;
 
-	private LocalDate baja;
+	private LocalDateTime baja;
 }

@@ -41,9 +41,12 @@ public class DatosMercadoPagoService extends
 
 	@Autowired
 	public PedidoVentaRepository pedidoVentaRepository;
-
+	
 	@Transactional
-	public String createPreference(String idPedidoVenta) throws MPException, MPApiException {
+	public String createPreference(String idPedidoVenta) throws MPException, MPApiException 
+	{
+		final String url = "https://85d4-191-82-216-148.ngrok-free.app"; // Usar un tunel, MP no reconoce el localhost para hacer redireccion
+
 		Optional<PedidoVenta> pedidoVenta = pedidoVentaRepository.findById(idPedidoVenta);
 		if (pedidoVenta.isPresent()) {
 			List<PreferenceItemRequest> items = new ArrayList<>();
@@ -60,12 +63,21 @@ public class DatosMercadoPagoService extends
 						.build();
 				items.add(itemRequest);
 			}
-			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().success("http://localhost:5173/")
-					.pending("http://localhost:5173/").failure("http://localhost:5173/").build();
-			PreferenceRequest preferenceRequest = PreferenceRequest.builder().items(items).backUrls(backUrls).build();
-			PreferenceClient client = new PreferenceClient();
-			Preference preference = client.create(preferenceRequest);
-			return preference.getId();
+			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().success(url).pending(url).failure(url).build();
+			PreferenceRequest preferenceRequest = PreferenceRequest.builder().items(items).backUrls(backUrls).autoReturn("all").build();
+			
+			try 
+			{
+				PreferenceClient client = new PreferenceClient();
+				Preference preference = client.create(preferenceRequest);
+				return preference.getId();
+
+			} catch (MPApiException e) 
+			{
+				System.out.println("Error status: " + e.getApiResponse().getStatusCode());
+				System.out.println("Error content: " + e.getApiResponse().getContent());
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}

@@ -3,7 +3,7 @@ package com.buenSabor.entity;
 import java.io.Serializable;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,7 +33,7 @@ public class Cliente extends ABM implements Serializable {
 	@OneToOne
 	private Usuario usuario;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private Domicilio domicilio;
 	
 

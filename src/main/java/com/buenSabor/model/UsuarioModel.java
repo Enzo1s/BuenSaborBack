@@ -20,6 +20,8 @@ public class UsuarioModel {
 	
 	private Rol rol;
 	
+	private SucursalEmpresaModel sucursalEmpresa;
+	
 	private EmpresaModel empresa;
 	
     private LocalDateTime modificacion;

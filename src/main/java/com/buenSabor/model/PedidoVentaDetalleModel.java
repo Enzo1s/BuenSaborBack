@@ -1,6 +1,7 @@
 package com.buenSabor.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class PedidoVentaDetalleModel {
 	
 	private ArticuloInsumoModel articuloInsumo;
 	
-	private PromocionModel promocion;
+	private List<PromocionModel> promocion;
 	
 	private LocalDateTime modificacion;
 

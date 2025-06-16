@@ -1,5 +1,6 @@
 package com.buenSabor.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,6 @@ CommonConverter<SucursalInsumoModel,SucursalInsumo>, CommonRepository<SucursalIn
 		List<SucursalInsumo> listado = sucursalInsumoRepository.findBySucursalEmpresaId(id);
 		if(listado != null && !listado.isEmpty())
 			return listado.stream().map(si -> converter.entidadToModeloRes(si)).toList();
-		return null;
+		return new ArrayList<>();
 	}
 }

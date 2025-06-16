@@ -1,5 +1,8 @@
 package com.buenSabor.restcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.buenSabor.dto.LoginDTO;
+import com.buenSabor.exeptions.ExistingEntityException;
+import com.buenSabor.exeptions.PasswordException;
 import com.buenSabor.jwt.JWTUtil;
 import com.buenSabor.model.UsuarioModel;
 import com.buenSabor.serviceimpl.UsuarioService;
@@ -38,13 +44,24 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UsuarioModel usuario) {
-    	try {
-			String token = usuarioService.registrar(usuario);
-			return ResponseEntity.status(HttpStatus.CREATED).body(token);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().build();
-		}
+    	Map<String, String> response = new HashMap<>();
+			try {
+				return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrar(usuario));
+			} catch (JWTCreationException e) {				
+				e.printStackTrace();
+				response.put("error", e.getMessage());
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				response.put("error", e.getMessage());
+			} catch (ExistingEntityException e) {
+				e.printStackTrace();
+				response.put("error", e.getMessage());
+			} catch (PasswordException e) {
+				e.printStackTrace();
+				response.put("error", e.getMessage());
+			}
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	
     }
     
 }

@@ -45,7 +45,7 @@ public class DatosMercadoPagoService extends
 	@Transactional
 	public String createPreference(String idPedidoVenta) throws MPException, MPApiException 
 	{
-		final String url = "https://85d4-191-82-216-148.ngrok-free.app"; // Usar un tunel, MP no reconoce el localhost para hacer redireccion
+		final String url = "https://2e09-181-239-19-229.ngrok-free.app"; // Usar un tunel, MP no reconoce el localhost para hacer redireccion
 
 		Optional<PedidoVenta> pedidoVenta = pedidoVentaRepository.findById(idPedidoVenta);
 		if (pedidoVenta.isPresent()) {

@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 
 import com.buenSabor.enums.FormaPago;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,7 +46,7 @@ public class FacturaVenta extends ABM implements Serializable {
 	@OneToOne
 	private DatosMercadoPago datosMP;
 	
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FacturaVentaDetalle> facturaVentaDetalle;
 	
 	

@@ -10,5 +10,6 @@ import com.buenSabor.serviceimpl.PromocionService;
 @RestController
 @RequestMapping(path = "/promocion")
 public class PromocionRestController extends CommonController<PromocionModel, PromocionService>{
+	
 
 }

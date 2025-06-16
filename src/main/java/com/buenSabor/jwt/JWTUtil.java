@@ -15,6 +15,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.buenSabor.dto.LoginDTO;
 import com.buenSabor.entity.Usuario;
+import com.buenSabor.exeptions.PasswordException;
 import com.buenSabor.repository.UsuarioRepository;
 
 import java.time.Instant;
@@ -35,7 +36,7 @@ public class JWTUtil {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public String generateToken(LoginDTO model) throws Exception {
+    public String generateToken(LoginDTO model) throws JWTCreationException, NullPointerException, PasswordException {
     	Usuario usuario = usuarioRepository.findByUsername(model.username());
     	
         try {
@@ -57,10 +58,10 @@ public class JWTUtil {
 		return null;
     }
 
-    private void checkPass(Usuario usuario, String password) throws Exception {
+    private void checkPass(Usuario usuario, String password) throws PasswordException {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if (!encoder.matches(password, usuario.getPassword())) {
-			throw new Exception("Contraseña incorrecta");
+			throw new PasswordException("Contraseña incorrecta");
 		}
 	}
     

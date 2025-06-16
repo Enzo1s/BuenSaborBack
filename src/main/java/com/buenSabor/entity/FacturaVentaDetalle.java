@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import jakarta.persistence.Id;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,10 +27,10 @@ public class FacturaVentaDetalle extends ABM implements Serializable {
 
 	private double subTotal;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.DETACH, orphanRemoval = true)
 	private List<ArticuloManufacturado> articuloManufacturado;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.DETACH, orphanRemoval = true)
 	private List<ArticuloInsumo> articuloInsumo;
 	
 }

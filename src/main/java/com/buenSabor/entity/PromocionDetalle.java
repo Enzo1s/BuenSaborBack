@@ -26,5 +26,8 @@ public class PromocionDetalle extends ABM implements Serializable {
 	
 	@ManyToOne
 	private ArticuloManufacturado articuloManufacturado;
+	
+	@ManyToOne
+	private ArticuloInsumo articuloInsumo;
 
 }

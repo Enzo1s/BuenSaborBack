@@ -13,6 +13,8 @@ public class PromocionDetalleModel {
 	
 	private ArticuloManufacturadoModel articuloManufacturado;
 	
+	private ArticuloInsumoModel articuloInsumo;
+	
 	private LocalDateTime modificacion;
 
 	private LocalDateTime alta;

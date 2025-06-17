@@ -1,17 +1,29 @@
 package com.buenSabor.dto;
 
-import java.math.BigDecimal;
-
 import lombok.Data;
 
 @Data
 public class MPForm {
 
-	private int installments;
-	private String issuer_id;
-	private Payer payer;
-	private String payment_method_id;
-	private String token;
-	private BigDecimal transaction_amount;
-	private String description;
+	private String collectionId;
+
+	private String collectionStatus;
+
+	private String paymentId;
+
+	private String status;
+
+	private String externalReference;
+
+	private String paymentType;
+
+	private String merchantOrderId;
+
+	private String preferenceId;
+
+	private String siteId;
+
+	private String processingMode;
+
+	private String merchantAccountId;
 }

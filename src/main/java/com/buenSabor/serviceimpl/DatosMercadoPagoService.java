@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.commonservice.CommonServiceImpl;
@@ -33,6 +34,7 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -41,12 +43,22 @@ public class DatosMercadoPagoService extends
 
 	@Autowired
 	public PedidoVentaRepository pedidoVentaRepository;
-	
+
+	@Value("${mercadopago.urlReturn}")
+	private String url;
+
+	@PostConstruct
+	public void init() {
+		url = url.replaceAll("/+$", "") + "/pedido-venta/Pago";
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
 	@Transactional
 	public String createPreference(String idPedidoVenta) throws MPException, MPApiException 
 	{
-		final String url = "https://2e09-181-239-19-229.ngrok-free.app"; // Usar un tunel, MP no reconoce el localhost para hacer redireccion
-
 		Optional<PedidoVenta> pedidoVenta = pedidoVentaRepository.findById(idPedidoVenta);
 		if (pedidoVenta.isPresent()) {
 			List<PreferenceItemRequest> items = new ArrayList<>();
@@ -63,7 +75,7 @@ public class DatosMercadoPagoService extends
 						.build();
 				items.add(itemRequest);
 			}
-			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().success(url).pending(url).failure(url).build();
+			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().success(getUrl()).pending(getUrl()).failure(getUrl()).build();
 			PreferenceRequest preferenceRequest = PreferenceRequest.builder().items(items).backUrls(backUrls).autoReturn("all").build();
 			
 			try 
@@ -82,47 +94,47 @@ public class DatosMercadoPagoService extends
 		return null;
 	}
 
-	public DatosMercadoPagoModel processBuy(MPForm request) throws MPException, MPApiException {
-		Map<String, String> customHeaders = new HashMap<>();
+// 	public DatosMercadoPagoModel processBuy(MPForm request) throws MPException, MPApiException {
+// 		Map<String, String> customHeaders = new HashMap<>();
 
-		customHeaders.put("x-idempotency-key", request.getToken());
-		MPRequestOptions requestOptions = MPRequestOptions.builder()
-				.customHeaders(customHeaders)
-				.build();
+// 		customHeaders.put("x-idempotency-key", request.getToken());
+// 		MPRequestOptions requestOptions = MPRequestOptions.builder()
+// 				.customHeaders(customHeaders)
+// 				.build();
  
-		PaymentClient client = new PaymentClient();
+// 		PaymentClient client = new PaymentClient();
 
-		PaymentCreateRequest paymentCreateRequest =
-				PaymentCreateRequest.builder()
-				.token(request.getToken())
-				.installments(request.getInstallments())
-				.transactionAmount(request.getTransaction_amount())
-//MercadoPagoConfig.setAccessToken("YOUR_ACCESS_TOKEN");
+// 		PaymentCreateRequest paymentCreateRequest =
+// 				PaymentCreateRequest.builder()
+// 				.token(request.getToken())
+// 				.installments(request.getInstallments())
+// 				.transactionAmount(request.getTransaction_amount())
+// //MercadoPagoConfig.setAccessToken("YOUR_ACCESS_TOKEN");
 
 
-       .description(request.getDescription())
-       .paymentMethodId(request.getPayment_method_id())
-       .payer(
-           PaymentPayerRequest.builder()
-               .email(request.getPayer().getEmail())
-//               .firstName(request.getPayer().getFirst_name())
-               .identification(
-                   IdentificationRequest.builder()
-                       .type(request.getPayer().getIdentification().getType())
-                       .number(request.getPayer().getIdentification().getNumber())
-                       .build())
-               .build())
-       .build();
+//        .description(request.getDescription())
+//        .paymentMethodId(request.getPayment_method_id())
+//        .payer(
+//            PaymentPayerRequest.builder()
+//                .email(request.getPayer().getEmail())
+// //               .firstName(request.getPayer().getFirst_name())
+//                .identification(
+//                    IdentificationRequest.builder()
+//                        .type(request.getPayer().getIdentification().getType())
+//                        .number(request.getPayer().getIdentification().getNumber())
+//                        .build())
+//                .build())
+//        .build();
 
-		Payment response = client.create(paymentCreateRequest, requestOptions);
-		DatosMercadoPago datosMP = new DatosMercadoPago();
-		datosMP.setDateApproved(response.getDateApproved().toLocalDate());
-		datosMP.setDateCreated(response.getDateCreated().toLocalDate());
-		datosMP.setDateLastUpdated(response.getDateLastUpdated().toLocalDate());
-		datosMP.setPaymentMethodId(response.getPaymentMethodId());
-		datosMP.setPaymentTypeId(response.getPaymentTypeId());
-		datosMP.setStatus(response.getStatus());
-		datosMP.setStatusDetail(response.getStatusDetail());
-		return converter.entidadToModeloRes(repository.save(datosMP));
-	}
+// 		Payment response = client.create(paymentCreateRequest, requestOptions);
+// 		DatosMercadoPago datosMP = new DatosMercadoPago();
+// 		datosMP.setDateApproved(response.getDateApproved().toLocalDate());
+// 		datosMP.setDateCreated(response.getDateCreated().toLocalDate());
+// 		datosMP.setDateLastUpdated(response.getDateLastUpdated().toLocalDate());
+// 		datosMP.setPaymentMethodId(response.getPaymentMethodId());
+// 		datosMP.setPaymentTypeId(response.getPaymentTypeId());
+// 		datosMP.setStatus(response.getStatus());
+// 		datosMP.setStatusDetail(response.getStatusDetail());
+// 		return converter.entidadToModeloRes(repository.save(datosMP));
+// 	}
 }

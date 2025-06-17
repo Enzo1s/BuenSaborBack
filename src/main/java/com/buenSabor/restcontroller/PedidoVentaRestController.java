@@ -1,12 +1,18 @@
 package com.buenSabor.restcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.buenSabor.Commoncontroller.CommonController;
+import com.buenSabor.enums.Estado;
 import com.buenSabor.model.PedidoVentaModel;
 import com.buenSabor.serviceimpl.PedidoVentaService;
 
@@ -19,4 +25,14 @@ public class PedidoVentaRestController extends CommonController<PedidoVentaModel
 		return ResponseEntity.ok(service.findByEmpleadoById(id));
 	}
 
+	@PutMapping
+	public ResponseEntity<?> updateStatus(@RequestParam String id, @RequestParam Estado status) {
+		PedidoVentaModel pedido = service.updateStatus(id, status);
+		if(pedido == null) {
+			Map<String, String> response = new HashMap<>();
+			response.put("error", "No se encontró el pedido");
+			return ResponseEntity.badRequest().body(response);
+		}
+		return ResponseEntity.ok(pedido);
+	}
 }

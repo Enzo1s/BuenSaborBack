@@ -150,7 +150,9 @@ public class ReportesService {
 		// Modelo
 		Paragraph empleado = new Paragraph();
 		empleado.add(new Chunk("Empleado: ", boldFont));
-		empleado.add(new Chunk(pedido.getEmpleado().getNombre() + pedido.getEmpleado().getApellido(), bodyFont));
+		empleado.add(new Chunk(pedido.getEmpleado() != null && pedido.getEmpleado().getNombre() != null 
+				&& pedido.getEmpleado().getApellido() != null
+				? pedido.getEmpleado().getNombre() + pedido.getEmpleado().getApellido(): "", bodyFont));
 		document.add(empleado);
 		
 		Paragraph formaPago = new Paragraph();
@@ -165,10 +167,12 @@ public class ReportesService {
 		
 		Paragraph detalle = new Paragraph();
 		for(PedidoVentaDetalle p: pedido.getPedidoVentaDetalle()) {
-			detalle.add(new Chunk(p.getArticuloInsumo() != null ? p.getArticuloInsumo().getDenominacion()
+			detalle.add(new Chunk(p.getArticuloInsumo() != null && p.getArticuloInsumo().getDenominacion() != null
+					? p.getArticuloInsumo().getDenominacion()
 					: p.getArticuloManufacturado().getDenominacion(), boldFont));
-			detalle.add(new Chunk(""+ (p.getArticuloInsumo() != null ? p.getArticuloInsumo().getPrecioVenta()
+			detalle.add(new Chunk(""+ (p.getArticuloManufacturado() != null ? p.getArticuloManufacturado().getPrecioVenta()
 					: p.getArticuloManufacturado().getPrecioVenta()) , bodyFont));
+			Subtotal.add(new Chunk("Cantidad: ", boldFont));
 			detalle.add(new Chunk(p.getCantidad() + "", boldFont));
 			document.add(detalle);
 		}

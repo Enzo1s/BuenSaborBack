@@ -1,6 +1,8 @@
 package com.buenSabor.entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,4 +45,16 @@ public class DatosMercadoPago extends ABM implements Serializable {
 
 	@Column(nullable = true)
 	private String merchantAccountId;
+	
+	private LocalDate dateApproved;
+	
+	private LocalDate dateCreated;
+	
+	private LocalDate dateLastUpdated;
+	
+	private String paymentTypeId;
+	
+	private String statusDetail;
+	
+	private String paymentMethodId;
 }

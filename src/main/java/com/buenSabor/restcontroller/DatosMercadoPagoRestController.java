@@ -42,19 +42,19 @@ public class DatosMercadoPagoRestController extends CommonController<DatosMercad
 		}
 	}
 	
-	// @PostMapping("/process_payment")
-	// public ResponseEntity<?> processPayment(@RequestBody MPForm mpForm) {
-	// 	Map<String, String> response = new HashMap<>();
-	// 	try {
-	// 		return ResponseEntity.ok(service.processBuy(mpForm));
-	// 	} catch (MPException e) {
-	// 		e.printStackTrace();
-	// 		response.put("error", e.getMessage());
-	// 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-	// 	} catch (MPApiException e) {
-	// 		e.printStackTrace();
-	// 		response.put("error", e.getMessage());
-	// 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-	// 	}
-	// }
+	 @PostMapping("/process_payment")
+	 public ResponseEntity<?> processPayment(@RequestBody MPForm mpForm) {
+	 	Map<String, String> response = new HashMap<>();
+	 	try {
+	 		return ResponseEntity.ok(service.processBuy(mpForm));
+	 	} catch (MPException e) {
+	 		e.printStackTrace();
+	 		response.put("error", e.getMessage());
+	 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	 	} catch (MPApiException e) {
+	 		e.printStackTrace();
+	 		response.put("error", e.getMessage());
+	 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	 	}
+	 }
 }

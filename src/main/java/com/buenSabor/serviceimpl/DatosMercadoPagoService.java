@@ -82,8 +82,19 @@ public class DatosMercadoPagoService extends
 						.build();
 				items.add(itemRequest);
 			}
-			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().success(getUrl()).pending(getUrl()).failure(getUrl()).build();
-			PreferenceRequest preferenceRequest = PreferenceRequest.builder().items(items).backUrls(backUrls).autoReturn("all").build();
+			
+			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().
+																		   success(getUrl()).
+																		   pending(getUrl()).
+																		   failure(getUrl()).
+																		   build();
+
+			PreferenceRequest preferenceRequest = PreferenceRequest.builder().
+																	items(items).
+																	backUrls(backUrls).
+																	autoReturn("all").
+																	externalReference(idPedidoVenta).
+																	build();
 			
 			try 
 			{

@@ -3,6 +3,7 @@ package com.buenSabor.serviceimpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +12,17 @@ import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.commonservice.CommonServiceImpl;
 import com.buenSabor.commonsrepository.CommonRepository;
 import com.buenSabor.converter.FacturaVentaDetalleConverter;
+import com.buenSabor.entity.DatosMercadoPago;
 import com.buenSabor.entity.FacturaVenta;
+import com.buenSabor.entity.PedidoVenta;
 import com.buenSabor.entity.SucursalInsumo;
 import com.buenSabor.model.ArticuloManufacturadoDetalleModel;
 import com.buenSabor.model.FacturaVentaDetalleModel;
 import com.buenSabor.model.FacturaVentaModel;
 import com.buenSabor.model.PedidoVentaDetalleModel;
 import com.buenSabor.model.PedidoVentaModel;
+import com.buenSabor.repository.FacturaVentaRepository;
+import com.buenSabor.repository.PedidoVentaRepository;
 import com.buenSabor.repository.SucursalInsumoRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +30,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FacturaVentaService extends CommonServiceImpl<FacturaVenta, FacturaVentaModel, 
 CommonConverter<FacturaVentaModel,FacturaVenta>, CommonRepository<FacturaVenta,String>>{
+
+    private final FacturaVentaRepository facturaVentaRepository;
 	
 	@Autowired
 	private SucursalInsumoRepository sucursalInsumoRepository;
 	
 	@Autowired
 	private FacturaVentaDetalleConverter facturaVentaDetalleConverter;
+
+	@Autowired
+	private PedidoVentaRepository pedidoVentaRepository;
+
+    FacturaVentaService(FacturaVentaRepository facturaVentaRepository) {
+        this.facturaVentaRepository = facturaVentaRepository;
+    }
 
 	@Transactional
 	public void nuevaFactura(PedidoVentaModel model) {
@@ -74,4 +88,32 @@ CommonConverter<FacturaVentaModel,FacturaVenta>, CommonRepository<FacturaVenta,S
 		factura.setTotalVenta(model.getTotal());
 		repository.save(factura);
 	}
+
+	@Transactional
+	public void asignarDatosMercadoPagoAFactura(String pedidoVentaId, DatosMercadoPago datosMP) 
+	{
+
+		//TODO Todavia no asigna el id de factura en el pedido de venta
+		Optional<PedidoVenta> pedidoVentaOpt = pedidoVentaRepository.findById(pedidoVentaId);
+		System.out.println("Entra en asignarDatosMercadoPagoAFactura con ID: " + pedidoVentaId);
+		
+		if (pedidoVentaOpt.isPresent()) 
+		{
+			PedidoVenta pedido = pedidoVentaOpt.get();
+			if (pedido.getFactura() != null) 
+			{
+				FacturaVenta factura = pedido.getFactura();
+				System.out.println("FacturaVenta encontrada: " + factura.getId());
+				factura.setDatosMP(datosMP);
+				facturaVentaRepository.save(factura);
+			} else 
+			{
+				System.out.println("⚠️ El PedidoVenta no tiene FacturaVenta asociada.");
+			}
+		} else 
+		{
+			System.out.println("❌ PedidoVenta no encontrado con ID: " + pedidoVentaId);
+		}
+	}
+
 }

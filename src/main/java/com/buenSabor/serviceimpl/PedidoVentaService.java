@@ -62,7 +62,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		}
 		return null;
 	}
-
+	//TODO Falta asignar id de factura. Id de empleado o cliente no funciona.
 	@Override
 	@Transactional
 	public PedidoVentaModel save(PedidoVentaModel model) {
@@ -97,6 +97,17 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 					}
 				}
 			}
+			if (model.getCliente() != null) 
+			{
+				System.out.println("Cliente: " + model.getCliente().getId());
+				model.setCliente(model.getCliente());
+			} else if (model.getEmpleado() != null) 
+			{
+				System.out.println("Empleado: " + model.getEmpleado().getId());
+				model.setEmpleado(model.getEmpleado());
+			}
+			else System.out.println("No hay datos de cliente o empleado");
+
 			factura.setFacturaVentaDetalle(detalles.stream().map(detalle -> facturaVentaDetalleConverter.modeloReqToEntidad(detalle)).toList());
 			
 			factura.setFechaFacturacion(LocalDateTime.now());
@@ -105,6 +116,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 			factura.setNumeroComprobante((long) LocalDateTime.now().getSecond());
 			factura.setSubTotal(model.getSubtotal());
 			factura.setTotalVenta(model.getTotal());
+			
 			facturaVentaRepository.save(factura);
 		}
 		return super.save(model);

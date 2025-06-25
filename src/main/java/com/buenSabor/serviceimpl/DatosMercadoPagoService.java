@@ -1,10 +1,9 @@
 package com.buenSabor.serviceimpl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +20,12 @@ import com.buenSabor.entity.PedidoVenta;
 import com.buenSabor.entity.PedidoVentaDetalle;
 import com.buenSabor.model.DatosMercadoPagoModel;
 import com.buenSabor.repository.PedidoVentaRepository;
-import com.mercadopago.client.common.IdentificationRequest;
-import com.mercadopago.client.payment.PaymentClient;
-import com.mercadopago.client.payment.PaymentCreateRequest;
-import com.mercadopago.client.payment.PaymentPayerRequest;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
-import com.mercadopago.core.MPRequestOptions;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 
 import jakarta.annotation.PostConstruct;
@@ -50,7 +43,7 @@ public class DatosMercadoPagoService extends
 	
 	@Autowired
 	private PedidoVentaConverter pedidoVentaConverter;
-
+	
 	@Value("${mercadopago.urlReturn}")
 	private String url;
 
@@ -113,47 +106,31 @@ public class DatosMercadoPagoService extends
 		return null;
 	}
 
- 	public DatosMercadoPagoModel processBuy(MPForm request) throws MPException, MPApiException {
- 		Map<String, String> customHeaders = new HashMap<>();
+	@Transactional
+	public DatosMercadoPagoModel processBuy(MPForm request) throws MPException, MPApiException
+	{
+		DatosMercadoPago datosMP = new DatosMercadoPago();
 
- 		customHeaders.put("x-idempotency-key", request.getToken());
- 		MPRequestOptions requestOptions = MPRequestOptions.builder()
- 				.customHeaders(customHeaders)
- 				.build();
- 
- 		PaymentClient client = new PaymentClient();
+		datosMP.setCollectionId(request.getCollectionId());
+		datosMP.setCollectionStatus(request.getCollectionStatus());
+		datosMP.setPaymentId(request.getPaymentId());
+		datosMP.setStatus(request.getStatus());
+		datosMP.setExternalReference(request.getExternalReference());
+		datosMP.setPaymentType(request.getPaymentType());
+		datosMP.setMerchantOrderId(request.getMerchantOrderId());
+		datosMP.setPreferenceId(request.getPreferenceId());
+		datosMP.setSiteId(request.getSiteId());
+		datosMP.setProcessingMode(request.getProcessingMode());
+		datosMP.setMerchantAccountId(request.getMerchantAccountId());
+		datosMP.setDateCreated(LocalDate.now());
 
- 		PaymentCreateRequest paymentCreateRequest =
- 				PaymentCreateRequest.builder()
- 				.token(request.getToken())
- 				.installments(request.getInstallments())
- 				.transactionAmount(request.getTransaction_amount())
- //MercadoPagoConfig.setAccessToken("YOUR_ACCESS_TOKEN");
+		if(request.getStatus() == "approved") datosMP.setDateApproved(LocalDate.now());
 
+		DatosMercadoPago datosMPSaved = repository.save(datosMP);
 
-        .description(request.getDescription() != null ? request.getDescription(): "")
-        .paymentMethodId(request.getPayment_method_id())
-        .payer(
-            PaymentPayerRequest.builder()
-                .email(request.getPayer().getEmail())
- //               .firstName(request.getPayer().getFirst_name())
-                .identification(
-                    IdentificationRequest.builder()
-                        .type(request.getPayer().getIdentification().getType())
-                        .number(request.getPayer().getIdentification().getNumber())
-                        .build())
-                .build())
-        .build();
+		facturaVentaService.asignarDatosMercadoPagoAFactura(request.getExternalReference(), datosMPSaved);
+		
+		return converter.entidadToModeloRes(datosMPSaved);
+	}
 
- 		Payment response = client.create(paymentCreateRequest, requestOptions);
- 		DatosMercadoPago datosMP = new DatosMercadoPago();
- 		datosMP.setDateApproved(response.getDateApproved().toLocalDate());
- 		datosMP.setDateCreated(response.getDateCreated().toLocalDate());
- 		datosMP.setDateLastUpdated(response.getDateLastUpdated().toLocalDate());
- 		datosMP.setPaymentMethodId(response.getPaymentMethodId());
- 		datosMP.setPaymentTypeId(response.getPaymentTypeId());
- 		datosMP.setStatus(response.getStatus());
- 		datosMP.setStatusDetail(response.getStatusDetail());
- 		return converter.entidadToModeloRes(repository.save(datosMP));
- 	}
 }

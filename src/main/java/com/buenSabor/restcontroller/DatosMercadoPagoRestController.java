@@ -45,7 +45,7 @@ public class DatosMercadoPagoRestController extends CommonController<DatosMercad
 	 @PostMapping("/process_payment")
 	 public ResponseEntity<?> processPayment(@RequestBody MPForm mpForm) {
 	 	Map<String, String> response = new HashMap<>();
-	 	try {
+		try {
 	 		return ResponseEntity.ok(service.processBuy(mpForm));
 	 	} catch (MPException e) {
 	 		e.printStackTrace();

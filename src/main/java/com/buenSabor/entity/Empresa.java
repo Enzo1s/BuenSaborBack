@@ -24,7 +24,7 @@ public class Empresa extends ABM implements Serializable {
 	private String id;
 	private String nombre;
 	private String razonSocial;
-	private int cuil;
+	private long cuil;
 	@OneToMany
 	private List<SucursalEmpresa> sucursalEmpresa;
 

@@ -62,63 +62,55 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		}
 		return null;
 	}
-	//TODO Falta asignar id de factura. Id de empleado o cliente no funciona.
+	//TODO Falta asignar id de factura.
 	@Override
 	@Transactional
-	public PedidoVentaModel save(PedidoVentaModel model) {
-		if(model.getFormaPago().equals(FormaPago.EFECTIVO)) {
-			FacturaVenta factura = new FacturaVenta();
-			factura.setDescuento(model.getDescuento());
-			List<FacturaVentaDetalleModel> detalles = new ArrayList<>();
-			for(PedidoVentaDetalleModel pedidoDetalle : model.getPedidoVentaDetalle()) {
-				FacturaVentaDetalleModel detalle = new FacturaVentaDetalleModel();
-				detalle.setArticuloInsumo(pedidoDetalle.getArticuloInsumo());
-				detalle.setArticuloManufacturado(pedidoDetalle.getArticuloManufacturado());
-				detalle.setCantidad(pedidoDetalle.getCantidad());
-				detalle.setSubTotal(pedidoDetalle.getSubTotal());
-				detalles.add(detalle);
-				List<SucursalInsumo> sucursalesInsumo = sucursalInsumoRepository.findBySucursalEmpresaId(model.getSucursal().getId());
-				if(pedidoDetalle.getArticuloInsumo() != null) {
+	public PedidoVentaModel save(PedidoVentaModel model) 
+	{
+		FacturaVenta factura = new FacturaVenta();
+		factura.setDescuento(model.getDescuento());
+		List<FacturaVentaDetalleModel> detalles = new ArrayList<>();
+		for(PedidoVentaDetalleModel pedidoDetalle : model.getPedidoVentaDetalle()) {
+			FacturaVentaDetalleModel detalle = new FacturaVentaDetalleModel();
+			detalle.setArticuloInsumo(pedidoDetalle.getArticuloInsumo());
+			detalle.setArticuloManufacturado(pedidoDetalle.getArticuloManufacturado());
+			detalle.setCantidad(pedidoDetalle.getCantidad());
+			detalle.setSubTotal(pedidoDetalle.getSubTotal());
+			detalles.add(detalle);
+			List<SucursalInsumo> sucursalesInsumo = sucursalInsumoRepository.findBySucursalEmpresaId(model.getSucursal().getId());
+			if(pedidoDetalle.getArticuloInsumo() != null) {
+				for(SucursalInsumo sucursal: sucursalesInsumo) {
+					if(pedidoDetalle.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
+						sucursal.setStockActual(sucursal.getStockActual() - pedidoDetalle.getCantidad() );
+						sucursalInsumoRepository.save(sucursal);							
+					}
+				}
+			}
+			if(pedidoDetalle.getArticuloManufacturado() != null) {
+				for(ArticuloManufacturadoDetalleModel manufacturado: pedidoDetalle.getArticuloManufacturado().getArticuloManufacturadoDetalle()) {
 					for(SucursalInsumo sucursal: sucursalesInsumo) {
-						if(pedidoDetalle.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
-							sucursal.setStockActual(sucursal.getStockActual() - pedidoDetalle.getCantidad() );
+						if(manufacturado.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
+							sucursal.setStockActual(sucursal.getStockActual() - (manufacturado.getCantidad() * pedidoDetalle.getCantidad()));
 							sucursalInsumoRepository.save(sucursal);							
 						}
 					}
 				}
-				if(pedidoDetalle.getArticuloManufacturado() != null) {
-					for(ArticuloManufacturadoDetalleModel manufacturado: pedidoDetalle.getArticuloManufacturado().getArticuloManufacturadoDetalle()) {
-						for(SucursalInsumo sucursal: sucursalesInsumo) {
-							if(manufacturado.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
-								sucursal.setStockActual(sucursal.getStockActual() - (manufacturado.getCantidad() * pedidoDetalle.getCantidad()));
-								sucursalInsumoRepository.save(sucursal);							
-							}
-						}
-					}
-				}
 			}
-			if (model.getCliente() != null) 
-			{
-				System.out.println("Cliente: " + model.getCliente().getId());
-				model.setCliente(model.getCliente());
-			} else if (model.getEmpleado() != null) 
-			{
-				System.out.println("Empleado: " + model.getEmpleado().getId());
-				model.setEmpleado(model.getEmpleado());
-			}
-			else System.out.println("No hay datos de cliente o empleado");
-
-			factura.setFacturaVentaDetalle(detalles.stream().map(detalle -> facturaVentaDetalleConverter.modeloReqToEntidad(detalle)).toList());
-			
-			factura.setFechaFacturacion(LocalDateTime.now());
-			factura.setFormaPago(model.getFormaPago());
-			factura.setGastosEnvio(model.getGastosEnvio());
-			factura.setNumeroComprobante((long) LocalDateTime.now().getSecond());
-			factura.setSubTotal(model.getSubtotal());
-			factura.setTotalVenta(model.getTotal());
-			
-			facturaVentaRepository.save(factura);
 		}
+		
+		if (model.getCliente() != null) model.setCliente(model.getCliente());
+		else if (model.getEmpleado() != null) model.setEmpleado(model.getEmpleado());
+
+		factura.setFacturaVentaDetalle(detalles.stream().map(detalle -> facturaVentaDetalleConverter.modeloReqToEntidad(detalle)).toList());
+		
+		factura.setFechaFacturacion(LocalDateTime.now());
+		factura.setFormaPago(model.getFormaPago());
+		factura.setGastosEnvio(model.getGastosEnvio());
+		factura.setNumeroComprobante((long) LocalDateTime.now().getSecond());
+		factura.setSubTotal(model.getSubtotal());
+		factura.setTotalVenta(model.getTotal());
+		
+		facturaVentaRepository.save(factura);
 		return super.save(model);
 	}
 	

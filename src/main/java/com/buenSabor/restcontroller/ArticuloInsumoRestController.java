@@ -24,4 +24,10 @@ public class ArticuloInsumoRestController extends CommonController<ArticuloInsum
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+	
+	@GetMapping("/prueba")
+	public ResponseEntity<?> prueba(@RequestParam String id) {
+		service.prueba(id);
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 }

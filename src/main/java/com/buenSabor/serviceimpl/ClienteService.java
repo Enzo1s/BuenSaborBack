@@ -17,13 +17,20 @@ import com.buenSabor.repository.ClienteRepository;
 public class ClienteService extends CommonServiceImpl<Cliente, ClienteModel, 
 CommonConverter<ClienteModel,Cliente>, CommonRepository<Cliente,String>>{
 
-//	@Autowired
-//	private ClienteRepository clienteRepository;
-//	
+    @Autowired
+    private ClienteRepository clienteRepository;
+	
 //	public List<ClienteModel> listadoPorSucursal(String id) {
 //		List<Cliente> listado = clienteRepository.findByfindBySucursalEmpresaId(id);
 //		if(listado != null && !listado.isEmpty())
 //			return listado.stream().map(si -> converter.entidadToModeloRes(si)).toList();
 //		return new ArrayList<>();
 //	}
+
+    public ClienteModel findByUsuarioId(String id) {
+		Cliente cliente = clienteRepository.findByUsuarioId(id);
+		if(cliente != null) 
+			return converter.entidadToModeloRes(cliente);
+		return null;
+	}
 }

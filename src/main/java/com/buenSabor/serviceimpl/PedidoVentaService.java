@@ -44,10 +44,9 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 	
 	@Autowired
 	private FacturaVentaDetalleConverter facturaVentaDetalleConverter;
-	
+
 	@Autowired
 	private FacturaVentaConverter facturaVentaConverter;
-	
 	
 	public List<PedidoVentaModel> findByEmpleadoById(String id) {
 		List<PedidoVenta> entities = pedidoVentaRepository.findByEmpleadoId(id);
@@ -116,7 +115,9 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		factura.setSubTotal(model.getSubtotal());
 		factura.setTotalVenta(model.getTotal());
 		
-		facturaVentaRepository.save(factura);
+		FacturaVenta facturaGuardada = facturaVentaRepository.save(factura);
+		model.setFactura(facturaVentaConverter.entidadToModeloRes(facturaGuardada));
+		
 		return super.save(model);
 	}
 	
@@ -160,16 +161,9 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 					throw new StockException("La sucursal no cuenta con sotck");
 				}
 			}
-			if (model.getCliente() != null) 
-			{
-				System.out.println("Cliente: " + model.getCliente().getId());
-				model.setCliente(model.getCliente());
-			} else if (model.getEmpleado() != null) 
-			{
-				System.out.println("Empleado: " + model.getEmpleado().getId());
-				model.setEmpleado(model.getEmpleado());
-			}
-			else System.out.println("No hay datos de cliente o empleado");
+
+			if (model.getCliente() != null) model.setCliente(model.getCliente());
+			else if (model.getEmpleado() != null) model.setEmpleado(model.getEmpleado());
 
 			factura.setFacturaVentaDetalle(detalles.stream().map(detalle -> facturaVentaDetalleConverter.modeloReqToEntidad(detalle)).toList());
 			
@@ -179,11 +173,12 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 			factura.setNumeroComprobante((long) LocalDateTime.now().getSecond());
 			factura.setSubTotal(model.getSubtotal());
 			factura.setTotalVenta(model.getTotal());
-			
-			factura = facturaVentaRepository.save(factura);
-			model.setFactura(facturaVentaConverter.entidadToModeloRes(factura));
+
+			FacturaVenta facturaGuardada = facturaVentaRepository.save(factura);
+			model.setFactura(facturaVentaConverter.entidadToModeloRes(facturaGuardada));
+
 		
-		return super.save(model);
+			return super.save(model);
 	}
 	
 	public List<PedidoVentaModel> findBySucursalById(String id) {

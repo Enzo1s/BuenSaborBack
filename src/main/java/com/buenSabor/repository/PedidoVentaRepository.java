@@ -15,6 +15,8 @@ public interface PedidoVentaRepository extends CommonRepository<PedidoVenta, Str
 
 	List<PedidoVenta> findByEmpleadoId(String id);
 	
+	List<PedidoVenta> findBySucursalId(String id);
+	
 	@Query("SELECT p FROM PedidoVenta p WHERE "
     		+ "	  p.fechaPedido >= :inicio AND p.fechaPedido <= :fin")
 	List<PedidoVenta> listarPorRangoFecha(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);

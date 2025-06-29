@@ -51,5 +51,10 @@ public class PedidoVentaRestController extends CommonController<PedidoVentaModel
 		}
 	}
 	
+	@GetMapping("/sucursal")
+	public ResponseEntity<?> listadoPorSucursal(@RequestParam String id) {
+		return ResponseEntity.ok(service.findBySucursalById(id));
+	}
+	
 	
 }

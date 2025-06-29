@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.buenSabor.commonconverter.CommonConverter;
 import com.buenSabor.commonservice.CommonServiceImpl;
 import com.buenSabor.commonsrepository.CommonRepository;
+import com.buenSabor.converter.FacturaVentaConverter;
 import com.buenSabor.converter.FacturaVentaDetalleConverter;
 import com.buenSabor.entity.FacturaVenta;
 import com.buenSabor.entity.PedidoVenta;
@@ -43,6 +44,9 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 	
 	@Autowired
 	private FacturaVentaDetalleConverter facturaVentaDetalleConverter;
+	
+	@Autowired
+	private FacturaVentaConverter facturaVentaConverter;
 	
 	
 	public List<PedidoVentaModel> findByEmpleadoById(String id) {
@@ -135,7 +139,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 						if(pedidoDetalle.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
 							sucursal.setStockActual(sucursal.getStockActual() - pedidoDetalle.getCantidad() );
 							if(sucursal.getStockActual() < 0)
-								throw new StockException("Stock insuficiente");
+								throw new StockException("Stock insuficiente de " + sucursal.getArticuloInsumo().getDenominacion());
 							sucursalInsumoRepository.save(sucursal);							
 						}
 					}
@@ -146,7 +150,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 							if(manufacturado.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
 								sucursal.setStockActual(sucursal.getStockActual() - (manufacturado.getCantidad() * pedidoDetalle.getCantidad()));
 								if(sucursal.getStockActual() < 0)
-									throw new StockException("Stock insuficiente");
+									throw new StockException("Stock insuficiente de " + sucursal.getArticuloInsumo().getDenominacion());
 								sucursalInsumoRepository.save(sucursal);							
 							}
 						}
@@ -176,8 +180,18 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 			factura.setSubTotal(model.getSubtotal());
 			factura.setTotalVenta(model.getTotal());
 			
-			facturaVentaRepository.save(factura);
+			factura = facturaVentaRepository.save(factura);
+			model.setFactura(facturaVentaConverter.entidadToModeloRes(factura));
 		
 		return super.save(model);
+	}
+	
+	public List<PedidoVentaModel> findBySucursalById(String id) {
+		List<PedidoVenta> entities = pedidoVentaRepository.findBySucursalId(id);
+		if(entities.isEmpty()) {
+			return new ArrayList<>();
+		} else {
+			return entities.stream().map(pv -> converter.entidadToModeloRes(pv)).toList();
+		}
 	}
 }

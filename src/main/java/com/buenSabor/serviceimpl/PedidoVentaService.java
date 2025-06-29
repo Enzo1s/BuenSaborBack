@@ -17,6 +17,7 @@ import com.buenSabor.entity.PedidoVenta;
 import com.buenSabor.entity.SucursalInsumo;
 import com.buenSabor.enums.Estado;
 import com.buenSabor.enums.FormaPago;
+import com.buenSabor.exeptions.StockException;
 import com.buenSabor.model.ArticuloManufacturadoDetalleModel;
 import com.buenSabor.model.FacturaVentaDetalleModel;
 import com.buenSabor.model.PedidoVentaDetalleModel;
@@ -63,9 +64,8 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		return null;
 	}
 	//TODO Falta asignar id de factura. Id de empleado o cliente no funciona.
-	@Override
 	@Transactional
-	public PedidoVentaModel save(PedidoVentaModel model) {
+	public PedidoVentaModel saveWithStock(PedidoVentaModel model) throws StockException {
 		if(model.getFormaPago().equals(FormaPago.EFECTIVO)) {
 			FacturaVenta factura = new FacturaVenta();
 			factura.setDescuento(model.getDescuento());
@@ -82,6 +82,8 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 					for(SucursalInsumo sucursal: sucursalesInsumo) {
 						if(pedidoDetalle.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
 							sucursal.setStockActual(sucursal.getStockActual() - pedidoDetalle.getCantidad() );
+							if(sucursal.getStockActual() < 0)
+								throw new StockException("Stock insuficiente");
 							sucursalInsumoRepository.save(sucursal);							
 						}
 					}
@@ -91,10 +93,15 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 						for(SucursalInsumo sucursal: sucursalesInsumo) {
 							if(manufacturado.getArticuloInsumo().getId().equals(sucursal.getArticuloInsumo().getId())) {
 								sucursal.setStockActual(sucursal.getStockActual() - (manufacturado.getCantidad() * pedidoDetalle.getCantidad()));
+								if(sucursal.getStockActual() < 0)
+									throw new StockException("Stock insuficiente");
 								sucursalInsumoRepository.save(sucursal);							
 							}
 						}
 					}
+				}
+				if(pedidoDetalle.getArticuloInsumo() == null && pedidoDetalle.getArticuloManufacturado() == null) {
+					throw new StockException("La sucursal no cuenta con sotck");
 				}
 			}
 			if (model.getCliente() != null) 

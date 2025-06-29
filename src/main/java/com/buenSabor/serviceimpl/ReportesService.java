@@ -2,31 +2,31 @@ package com.buenSabor.serviceimpl;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.awt.Color;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.buenSabor.dto.ReportePorFechaDTO;
 import com.buenSabor.entity.PedidoVenta;
 import com.buenSabor.entity.PedidoVentaDetalle;
 import com.buenSabor.repository.PedidoVentaRepository;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
 
-import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class ReportesService {
@@ -93,91 +93,97 @@ public class ReportesService {
 	@Transactional(readOnly = true)
 	public byte[] generarInstrumentoPDF(String id) throws Exception {
 		Optional<PedidoVenta> obj = pedidoVentaRepository.findById(id);
-
-		if (obj == null) {
-			throw new Exception("Instrumento no encontrado con ID: " + id);
+	
+		if (obj.isEmpty()) {
+			throw new Exception("Pedido no encontrado con ID: " + id);
 		}
-
+	
 		PedidoVenta pedido = obj.get();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Document document = new Document();
-
-		PdfWriter writer = PdfWriter.getInstance(document, out);
+	
+		PdfWriter.getInstance(document, out);
 		document.open();
-
+	
 		// Fuentes
-		Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
-		Font headerFont = new Font(Font.HELVETICA, 14, Font.BOLD);
-		Font bodyFont = new Font(Font.HELVETICA, 12);
-		Font priceFont = new Font(Font.HELVETICA, 16,
-				Font.BOLD);
-		Font boldFont = new Font(Font.HELVETICA, 12,
-				Font.BOLD);
-		Font grayFont = new Font(Font.HELVETICA, 12,
-				Font.NORMAL, java.awt.Color.GRAY);
+		Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD, Color.BLACK);
+		Font bodyFont = new Font(Font.HELVETICA, 12, Font.NORMAL, Color.BLACK);
+		Font boldFont = new Font(Font.HELVETICA, 12, Font.BOLD, Color.BLACK);
+		Font priceFont = new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 102, 204));
 
-		// Título principal
-		Paragraph title = new Paragraph("Detalles del Pedido", titleFont);
+	
+		// Título
+		Paragraph title = new Paragraph("Detalle del Pedido", titleFont);
 		title.setAlignment(Element.ALIGN_CENTER);
 		document.add(title);
 		document.add(Chunk.NEWLINE);
-
-		// Nombre del instrumento
-		Paragraph instrumentName = new Paragraph(pedido.getFechaPedido().toString(), headerFont);
-		instrumentName.setAlignment(Element.ALIGN_CENTER);
-		document.add(instrumentName);
-		document.add(Chunk.NEWLINE);
-
 	
-
-		// Precio
-		Paragraph price = new Paragraph("$ " + pedido.getTotal(), priceFont);
-		price.setAlignment(Element.ALIGN_CENTER);
-		document.add(price);
-		document.add(Chunk.NEWLINE);
-
-		// Línea separadora
-		document.add(new Paragraph("_____________________________________________"));
-		document.add(Chunk.NEWLINE);
-
-		if(pedido.getCliente() != null) {
-		Paragraph cliente = new Paragraph();
-		cliente.add(new Chunk("Cliente: ", boldFont));
-		cliente.add(new Chunk(pedido.getCliente().getNombre() + pedido.getCliente().getApellido(), bodyFont));
-		document.add(cliente);		
+		// Fecha del pedido
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
+		String fechaFormateada = pedido.getFechaPedido().format(formatter);
+		Paragraph fecha = new Paragraph("Fecha del pedido: " + fechaFormateada, bodyFont);
+		document.add(fecha);
+		
+		// Cliente
+		if (pedido.getCliente() != null) {
+			Paragraph cliente = new Paragraph("Cliente: " +
+				pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido(), bodyFont);
+			document.add(cliente);
 		}
-
-		// Modelo
-		Paragraph empleado = new Paragraph();
-		empleado.add(new Chunk("Empleado: ", boldFont));
-		empleado.add(new Chunk(pedido.getEmpleado() != null && pedido.getEmpleado().getNombre() != null 
-				&& pedido.getEmpleado().getApellido() != null
-				? pedido.getEmpleado().getNombre() + pedido.getEmpleado().getApellido(): "", bodyFont));
-		document.add(empleado);
-		
-		Paragraph formaPago = new Paragraph();
-		formaPago.add(new Chunk("Forma de pago: ", boldFont));
-		formaPago.add(new Chunk(pedido.getFormaPago().toString() , bodyFont));
-		document.add(formaPago);
-		
-		Paragraph Subtotal = new Paragraph();
-		Subtotal.add(new Chunk("Subtotal: ", boldFont));
-		Subtotal.add(new Chunk(pedido.getSubtotal().toString() , bodyFont));
-		document.add(Subtotal);
-		
-		Paragraph detalle = new Paragraph();
-		for(PedidoVentaDetalle p: pedido.getPedidoVentaDetalle()) {
-			detalle.add(new Chunk(p.getArticuloInsumo() != null && p.getArticuloInsumo().getDenominacion() != null
+	
+		// Empleado
+		if (pedido.getEmpleado() != null) {
+			Paragraph empleado = new Paragraph("Empleado: " +
+				pedido.getEmpleado().getNombre() + " " + pedido.getEmpleado().getApellido(), bodyFont);
+			document.add(empleado);
+		}
+	
+		// Forma de pago
+		document.add(new Paragraph("Forma de pago: " + pedido.getFormaPago(), bodyFont));
+	
+		// Tipo de envío
+		if (pedido.getTipoEnvio() != null) {
+			document.add(new Paragraph("Tipo de envío: " + pedido.getTipoEnvio(), bodyFont));
+		}
+	
+		document.add(Chunk.NEWLINE);
+	
+		// Tabla de productos
+		PdfPTable table = new PdfPTable(4);
+		table.setWidthPercentage(100);
+		table.setSpacingBefore(10f);
+		table.setSpacingAfter(10f);
+	
+		String[] headers = { "Artículo", "Cantidad", "Precio unitario", "Subtotal" };
+		for (String headerTitle : headers) {
+			PdfPCell header = new PdfPCell(new Phrase(headerTitle, boldFont));
+			header.setBackgroundColor(Color.LIGHT_GRAY);
+			header.setBorderWidth(2);
+			table.addCell(header);
+		}
+	
+		for (PedidoVentaDetalle p : pedido.getPedidoVentaDetalle()) {
+			String nombre = (p.getArticuloInsumo() != null)
 					? p.getArticuloInsumo().getDenominacion()
-					: p.getArticuloManufacturado().getDenominacion(), boldFont));
-			detalle.add(new Chunk(""+ (p.getArticuloManufacturado() != null ? p.getArticuloManufacturado().getPrecioVenta()
-					: p.getArticuloManufacturado().getPrecioVenta()) , bodyFont));
-			Subtotal.add(new Chunk("Cantidad: ", boldFont));
-			detalle.add(new Chunk(p.getCantidad() + "", boldFont));
-			document.add(detalle);
+					: p.getArticuloManufacturado().getDenominacion();
+			double precio = (p.getArticuloInsumo() != null)
+					? p.getArticuloInsumo().getPrecioVenta()
+					: p.getArticuloManufacturado().getPrecioVenta();
+	
+			table.addCell(new Phrase(nombre, bodyFont));
+			table.addCell(new Phrase(String.valueOf(p.getCantidad()), bodyFont));
+			table.addCell(new Phrase("$" + String.format("%.2f", precio), bodyFont));
+			table.addCell(new Phrase("$" + String.format("%.2f", precio * p.getCantidad()), bodyFont));
 		}
-
-
+	
+		document.add(table);
+	
+		// Totales
+		document.add(new Paragraph("Subtotal: $" + String.format("%.2f", pedido.getSubtotal()), bodyFont));
+		document.add(new Paragraph("Descuento: $" + String.format("%.2f", pedido.getDescuento()), bodyFont));
+		document.add(new Paragraph("Gastos de envío: $" + String.format("%.2f", pedido.getGastosEnvio()), bodyFont));
+		document.add(new Paragraph("TOTAL: $" + String.format("%.2f", pedido.getTotal()), priceFont));
+	
 		document.close();
 		return out.toByteArray();
 	}

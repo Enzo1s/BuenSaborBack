@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.buenSabor.dto.FechasDTO;
 import com.buenSabor.serviceimpl.ReportesService;
+import com.mercadopago.net.HttpStatus;
 
 @RestController
 @RequestMapping("/reportes")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+
 public class ReportesController {
 
 	 @Autowired
@@ -42,17 +44,21 @@ public class ReportesController {
 	    }
 
 	    @GetMapping("/pdf")
-	    public ResponseEntity<?> generarPDFInstrumento(@RequestParam String id) 
-	    {
-	        try {
-	            byte[] pdfBytes = reportesService.generarInstrumentoPDF(id);
+		public ResponseEntity<?> generarPDFInstrumento(@RequestParam String id) {
+			try {
+				byte[] pdfBytes = reportesService.generarInstrumentoPDF(id);
 
-	            return ResponseEntity.ok()
-	                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ReporteInstrumento_" + id + ".pdf")
-	                    .contentType(MediaType.APPLICATION_PDF)
-	                    .body(pdfBytes);
-	        } catch (Exception e) {
-	            return ResponseEntity.badRequest().body("No se pudo generar el PDF: " + e.getMessage());
-	        }
-	    }
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_PDF);
+				headers.setContentDispositionFormData("attachment", "reporte_pedido_" + id + ".pdf");
+				headers.add("Access-Control-Expose-Headers", "Content-Disposition");
+
+				return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+			} catch (Exception e) {
+				return ResponseEntity
+						.badRequest()
+						.body("No se pudo generar el PDF: " + e.getMessage());
+			}
+		}
+
 }

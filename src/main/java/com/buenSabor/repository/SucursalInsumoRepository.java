@@ -11,5 +11,7 @@ import com.buenSabor.entity.SucursalInsumo;
 public interface SucursalInsumoRepository extends CommonRepository<SucursalInsumo, String> {
 	
 	public List<SucursalInsumo> findBySucursalEmpresaId(String id);
+	
+	public SucursalInsumo findBySucursalEmpresaIdAndArticuloInsumoId(String sucursalEmpresaId, String articuloInsumoId);
 
 }

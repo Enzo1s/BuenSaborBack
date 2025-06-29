@@ -1,5 +1,8 @@
 package com.buenSabor.restcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,13 @@ public class ArticuloInsumoRestController extends CommonController<ArticuloInsum
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@GetMapping("/verificar-stock")
+	public ResponseEntity<?> verificarStock(@RequestParam String idInsumo, @RequestParam String idSucursal) {
+		Map<String, Double> response = new HashMap<>();
+		response.put("stock", service.verificarStock(idInsumo, idSucursal));
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
 	}
 	
 	@GetMapping("/prueba")

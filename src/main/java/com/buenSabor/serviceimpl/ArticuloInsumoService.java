@@ -14,8 +14,10 @@ import com.buenSabor.commonsrepository.CommonRepository;
 import com.buenSabor.entity.ArticuloInsumo;
 import com.buenSabor.model.ArticuloInsumoModel;
 import com.buenSabor.repository.ArticuloManufacturadoRepository;
+import com.buenSabor.repository.SucursalInsumoRepository;
 import com.buenSabor.utils.GuardarArchivos;
 import com.buenSabor.entity.ArticuloManufacturado;
+import com.buenSabor.entity.SucursalInsumo;
 
 import jakarta.transaction.Transactional;
 
@@ -25,6 +27,9 @@ CommonConverter<ArticuloInsumoModel,ArticuloInsumo>, CommonRepository<ArticuloIn
 	
 	@Autowired
 	private ArticuloManufacturadoRepository amRepository;
+	
+	@Autowired
+	private SucursalInsumoRepository sucursalInsumoRepository;
 	
 	@Autowired
 	private GuardarArchivos guardarArchivos;
@@ -60,6 +65,11 @@ CommonConverter<ArticuloInsumoModel,ArticuloInsumo>, CommonRepository<ArticuloIn
 	
 	public ResponseEntity<Resource> abrirArchivo(String archivo) {
 		return guardarArchivos.leerArchivo(archivo);
+	}
+	
+	public double verificarStock(String idInsumo, String idSucursal) {
+		SucursalInsumo sucursal = sucursalInsumoRepository.findBySucursalEmpresaIdAndArticuloInsumoId(idSucursal, idInsumo);
+		return sucursal.getStockActual();
 	}
 	
 	public void prueba(String id) {

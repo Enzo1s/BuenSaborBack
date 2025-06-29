@@ -116,8 +116,9 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		return super.save(model);
 	}
 	
+	@Transactional
 	public PedidoVentaModel saveWithStock(PedidoVentaModel model) throws StockException {
-		if(model.getFormaPago().equals(FormaPago.EFECTIVO)) {
+		
 			FacturaVenta factura = new FacturaVenta();
 			factura.setDescuento(model.getDescuento());
 			List<FacturaVentaDetalleModel> detalles = new ArrayList<>();
@@ -176,7 +177,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 			factura.setTotalVenta(model.getTotal());
 			
 			facturaVentaRepository.save(factura);
-		}
+		
 		return super.save(model);
 	}
 }

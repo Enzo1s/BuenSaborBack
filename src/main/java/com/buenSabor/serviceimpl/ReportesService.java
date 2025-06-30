@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,24 +42,51 @@ public class ReportesService {
 
 	@Transactional
 	public byte[] generarReporteExcel(LocalDate fechaDesde, LocalDate fechaHasta) throws Exception {
-		List<PedidoVenta> datos = pedidoVentaRepository.listarPorRangoFecha(fechaDesde, fechaHasta);
+
+		LocalDateTime fechaInicio = fechaDesde.atStartOfDay();
+		LocalDateTime fechaFin = fechaHasta.atTime(LocalTime.MAX);
+
+		List<PedidoVenta> datos = pedidoVentaRepository.listarPorRangoFecha(fechaInicio, fechaFin);
 
 		if (datos == null || datos.isEmpty()) {
 			throw new Exception("No hay datos para las fechas seleccionadas.");
 		}
 
 		try (Workbook workbook = new XSSFWorkbook()) {
-			Sheet sheet = workbook.createSheet("Pedidos");
+			DateTimeFormatter fechaPedidoFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
+			DateTimeFormatter nombreHojaFormatter = DateTimeFormatter.ofPattern("dd-MM-yy");
 
+			String nombreHoja = "Pedidos " + fechaDesde.format(nombreHojaFormatter) + " - "
+					+ fechaHasta.format(nombreHojaFormatter);
+			Sheet sheet = workbook.createSheet(nombreHoja);
+
+			// Estilo header
 			CellStyle headerStyle = workbook.createCellStyle();
 			org.apache.poi.ss.usermodel.Font font = workbook.createFont();
 			font.setBold(true);
 			headerStyle.setFont(font);
+			headerStyle.setFillForegroundColor(org.apache.poi.ss.usermodel.IndexedColors.GREY_25_PERCENT.getIndex());
+			
+			headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			headerStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
 
-			// Cabecera
+			// Estilo numérico para moneda
+			CellStyle currencyStyle = workbook.createCellStyle();
+			org.apache.poi.ss.usermodel.DataFormat format = workbook.createDataFormat();
+			currencyStyle.setDataFormat(format.getFormat("#,##0.00"));
+
+			// Header columnas
 			Row header = sheet.createRow(0);
-			String[] columnas = { "Fecha Pedido", "ArticuloInsumo", "ArticuloManufacturado", "Cantidad", "Precio Venta",
-					"Subtotal" };
+			String[] columnas = {
+					"Fecha Pedido",
+					"Cliente",
+					"Empleado",
+					"Artículo Insumo",
+					"Artículo Manufacturado",
+					"Cantidad",
+					"Precio Venta",
+					"Subtotal Pedido"
+			};
 
 			for (int i = 0; i < columnas.length; i++) {
 				Cell cell = header.createCell(i);
@@ -65,24 +95,63 @@ public class ReportesService {
 			}
 
 			int rowIdx = 1;
-			for (PedidoVenta r : datos) {
-				Row row = sheet.createRow(rowIdx++);
+			for (PedidoVenta pedido : datos) {
+				String fechaPedidoStr = pedido.getFechaPedido() != null
+						? pedido.getFechaPedido().format(fechaPedidoFormatter)
+						: "";
+				String clienteStr = (pedido.getCliente() != null)
+						? pedido.getCliente().getNombre() + " " + pedido.getCliente().getApellido()
+						: "";
+				String empleadoStr = (pedido.getEmpleado() != null)
+						? pedido.getEmpleado().getNombre() + " " + pedido.getEmpleado().getApellido()
+						: "";
 
-				row.createCell(0).setCellValue(r.getFechaPedido().toString());
-				for (PedidoVentaDetalle p : r.getPedidoVentaDetalle()) {
-					Row row2 = sheet.createRow(rowIdx++);
-					row2.createCell(1)
-							.setCellValue(p.getArticuloInsumo() != null ? p.getArticuloInsumo().getDenominacion() : "");
-					row2.createCell(2).setCellValue(
-							p.getArticuloManufacturado() != null ? p.getArticuloManufacturado().getDenominacion() : "");
-					row2.createCell(3).setCellValue(p.getCantidad());
-					row2.createCell(4)
-							.setCellValue(p.getArticuloInsumo() != null ? p.getArticuloInsumo().getPrecioVenta()
-									: p.getArticuloManufacturado().getPrecioVenta());
+				// Si el pedido no tiene detalles, pongo una sola fila con datos basicos
+				if (pedido.getPedidoVentaDetalle() == null || pedido.getPedidoVentaDetalle().isEmpty()) {
+					Row row = sheet.createRow(rowIdx++);
+					row.createCell(0).setCellValue(fechaPedidoStr);
+					row.createCell(1).setCellValue(clienteStr);
+					row.createCell(2).setCellValue(empleadoStr);
+					row.createCell(7)
+							.setCellValue(pedido.getSubtotal() != null ? pedido.getSubtotal().doubleValue() : 0.0);
+					row.getCell(7).setCellStyle(currencyStyle);
+					continue;
 				}
-				row.createCell(5).setCellValue(r.getSubtotal().doubleValue());
+
+				boolean primeraFilaPedido = true;
+				for (PedidoVentaDetalle detalle : pedido.getPedidoVentaDetalle()) {
+					Row row = sheet.createRow(rowIdx++);
+					if (primeraFilaPedido) {
+						row.createCell(0).setCellValue(fechaPedidoStr);
+						row.createCell(1).setCellValue(clienteStr);
+						row.createCell(2).setCellValue(empleadoStr);
+						row.createCell(7)
+								.setCellValue(pedido.getSubtotal() != null ? pedido.getSubtotal().doubleValue() : 0.0);
+						row.getCell(7).setCellStyle(currencyStyle);
+						primeraFilaPedido = false;
+					}
+					// Artículos y cantidades
+					row.createCell(3).setCellValue(
+							detalle.getArticuloInsumo() != null ? detalle.getArticuloInsumo().getDenominacion() : "");
+					row.createCell(4)
+							.setCellValue(detalle.getArticuloManufacturado() != null
+									? detalle.getArticuloManufacturado().getDenominacion()
+									: "");
+					row.createCell(5).setCellValue(detalle.getCantidad());
+
+					double precio = detalle.getArticuloInsumo() != null
+							? detalle.getArticuloInsumo().getPrecioVenta()
+							: (detalle.getArticuloManufacturado() != null
+									? detalle.getArticuloManufacturado().getPrecioVenta()
+									: 0.0);
+
+					Cell precioCell = row.createCell(6);
+					precioCell.setCellValue(precio);
+					precioCell.setCellStyle(currencyStyle);
+				}
 			}
 
+			// Auto-ajustar columnas
 			for (int i = 0; i < columnas.length; i++) {
 				sheet.autoSizeColumn(i);
 			}

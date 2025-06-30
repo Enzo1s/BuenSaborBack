@@ -1,6 +1,7 @@
 package com.buenSabor.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +20,5 @@ public interface PedidoVentaRepository extends CommonRepository<PedidoVenta, Str
 	
 	@Query("SELECT p FROM PedidoVenta p WHERE "
     		+ "	  p.fechaPedido >= :inicio AND p.fechaPedido <= :fin")
-	List<PedidoVenta> listarPorRangoFecha(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+	List<PedidoVenta> listarPorRangoFecha(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 }

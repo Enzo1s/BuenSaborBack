@@ -66,8 +66,7 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		}
 		return null;
 	}
-
-	//TODO Falta asignar id de factura.
+	
 	@Override
 	@Transactional
 	public PedidoVentaModel save(PedidoVentaModel model) 

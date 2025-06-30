@@ -44,9 +44,9 @@ public class ReportesController {
 	    }
 
 	    @GetMapping("/pdf")
-		public ResponseEntity<?> generarPDFInstrumento(@RequestParam String id) {
+		public ResponseEntity<?> generarPDF(@RequestParam String id) {
 			try {
-				byte[] pdfBytes = reportesService.generarInstrumentoPDF(id);
+				byte[] pdfBytes = reportesService.generarPDF(id);
 
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_PDF);

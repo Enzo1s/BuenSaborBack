@@ -49,7 +49,7 @@ public class DatosMercadoPagoService extends
 
 	@PostConstruct
 	public void init() {
-		url = url.replaceAll("/+$", "") + "/pedido-venta/Pago";
+		url = url.replaceAll("/+$", "") + "/pedido-venta/pago";
 	}
 
 	public String getUrl() {

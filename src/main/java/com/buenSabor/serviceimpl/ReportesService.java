@@ -59,8 +59,7 @@ public class ReportesService {
 			String nombreHoja = "Pedidos " + fechaDesde.format(nombreHojaFormatter) + " - "
 					+ fechaHasta.format(nombreHojaFormatter);
 			Sheet sheet = workbook.createSheet(nombreHoja);
-
-			// Estilo header
+			
 			CellStyle headerStyle = workbook.createCellStyle();
 			org.apache.poi.ss.usermodel.Font font = workbook.createFont();
 			font.setBold(true);
@@ -69,13 +68,11 @@ public class ReportesService {
 			
 			headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 			headerStyle.setAlignment(org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER);
-
-			// Estilo numérico para moneda
+			
 			CellStyle currencyStyle = workbook.createCellStyle();
 			org.apache.poi.ss.usermodel.DataFormat format = workbook.createDataFormat();
 			currencyStyle.setDataFormat(format.getFormat("#,##0.00"));
-
-			// Header columnas
+			
 			Row header = sheet.createRow(0);
 			String[] columnas = {
 					"Fecha Pedido",
@@ -106,7 +103,6 @@ public class ReportesService {
 						? pedido.getEmpleado().getNombre() + " " + pedido.getEmpleado().getApellido()
 						: "";
 
-				// Si el pedido no tiene detalles, pongo una sola fila con datos basicos
 				if (pedido.getPedidoVentaDetalle() == null || pedido.getPedidoVentaDetalle().isEmpty()) {
 					Row row = sheet.createRow(rowIdx++);
 					row.createCell(0).setCellValue(fechaPedidoStr);
@@ -130,7 +126,6 @@ public class ReportesService {
 						row.getCell(7).setCellStyle(currencyStyle);
 						primeraFilaPedido = false;
 					}
-					// Artículos y cantidades
 					row.createCell(3).setCellValue(
 							detalle.getArticuloInsumo() != null ? detalle.getArticuloInsumo().getDenominacion() : "");
 					row.createCell(4)

@@ -3,6 +3,8 @@ package com.buenSabor.restcontroller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import com.buenSabor.serviceimpl.UsuarioService;
 @RequestMapping("/auth")
 public class AuthController {
 	
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+	
 	@Autowired
 	private UsuarioService usuarioService;
 
@@ -38,10 +42,12 @@ public class AuthController {
             String token = jwtUtil.generateToken(usuario);
             return ResponseEntity.ok(token);
         } catch (PasswordException e) {
+            logger.error("Contraseña incorrecta");
             Map<String, String> response = new HashMap<>();
             response.put("error", "Contraseña incorrecta");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         } catch (UserNotFoundException e) {
+            logger.error("Usuario no encontrado");
             Map<String, String> response = new HashMap<>();
             response.put("error", "Usuario no encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);

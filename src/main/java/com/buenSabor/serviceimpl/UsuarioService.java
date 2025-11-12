@@ -12,6 +12,7 @@ import com.buenSabor.dto.LoginDTO;
 import com.buenSabor.entity.Usuario;
 import com.buenSabor.exeptions.ExistingEntityException;
 import com.buenSabor.exeptions.PasswordException;
+import com.buenSabor.exeptions.UserNotFoundException;
 import com.buenSabor.jwt.JWTUtil;
 import com.buenSabor.model.UsuarioModel;
 import com.buenSabor.repository.UsuarioRepository;
@@ -41,7 +42,7 @@ CommonConverter<UsuarioModel,Usuario>, CommonRepository<Usuario,String>>{
 	}
 
 	@Transactional
-	public String registrar(UsuarioModel usuario) throws ExistingEntityException, PasswordException, JWTCreationException, NullPointerException {
+	public String registrar(UsuarioModel usuario) throws ExistingEntityException, PasswordException, JWTCreationException, NullPointerException, UserNotFoundException {
 		Usuario userDB = usuarioRepository.findByUsername(usuario.getUsername());
 		if(userDB != null)
 			throw new ExistingEntityException("Username existente");

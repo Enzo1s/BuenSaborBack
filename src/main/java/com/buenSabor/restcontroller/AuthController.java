@@ -16,6 +16,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.buenSabor.dto.LoginDTO;
 import com.buenSabor.exeptions.ExistingEntityException;
 import com.buenSabor.exeptions.PasswordException;
+import com.buenSabor.exeptions.UserNotFoundException;
 import com.buenSabor.jwt.JWTUtil;
 import com.buenSabor.model.UsuarioModel;
 import com.buenSabor.serviceimpl.UsuarioService;
@@ -33,13 +34,21 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginDTO usuario) {
-    	try {
-			String token = jwtUtil.generateToken(usuario);
-			return ResponseEntity.ok(token);
-		} catch (Exception e) {		
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+        try {
+            String token = jwtUtil.generateToken(usuario);
+            return ResponseEntity.ok(token);
+        } catch (PasswordException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Contraseña incorrecta");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        } catch (UserNotFoundException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
     
     @PostMapping("/register")
@@ -48,16 +57,14 @@ public class AuthController {
 			try {
 				return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.registrar(usuario));
 			} catch (JWTCreationException e) {				
-				e.printStackTrace();
 				response.put("error", e.getMessage());
 			} catch (NullPointerException e) {
-				e.printStackTrace();
 				response.put("error", e.getMessage());
 			} catch (ExistingEntityException e) {
-				e.printStackTrace();
 				response.put("error", e.getMessage());
 			} catch (PasswordException e) {
-				e.printStackTrace();
+				response.put("error", e.getMessage());
+			} catch (UserNotFoundException e) {
 				response.put("error", e.getMessage());
 			}
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

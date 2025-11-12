@@ -16,6 +16,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.buenSabor.dto.LoginDTO;
 import com.buenSabor.entity.Usuario;
 import com.buenSabor.exeptions.PasswordException;
+import com.buenSabor.exeptions.UserNotFoundException;
 import com.buenSabor.repository.UsuarioRepository;
 
 import java.time.Instant;
@@ -36,10 +37,13 @@ public class JWTUtil {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public String generateToken(LoginDTO model) throws JWTCreationException, NullPointerException, PasswordException {
+    public String generateToken(LoginDTO model) throws JWTCreationException, NullPointerException, PasswordException, UserNotFoundException {
     	Usuario usuario = usuarioRepository.findByUsername(model.username());
     	
         try {
+            if (usuario == null) {
+                throw new UserNotFoundException("Usuario no encontrado");
+            }
         	checkPass(usuario, model.password());
         	return JWT.create()
         			.withIssuer(ISS)
@@ -51,10 +55,7 @@ public class JWTUtil {
 
         } catch (JWTCreationException e) {
 			log.error(e);
-		} catch (NullPointerException e) {
-			log.info("Usuario <" + model.username() + "> no encontrado");
-			return "Credenciales inválidas";
-        }
+		}
 		return null;
     }
 

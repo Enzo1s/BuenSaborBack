@@ -46,7 +46,6 @@ public class AuthController {
             response.put("error", "Usuario no encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

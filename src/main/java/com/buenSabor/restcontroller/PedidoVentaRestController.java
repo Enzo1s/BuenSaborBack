@@ -39,6 +39,18 @@ public class PedidoVentaRestController extends CommonController<PedidoVentaModel
 		}
 		return ResponseEntity.ok(pedido);
 	}
+
+	@PutMapping("/full-update")
+	public ResponseEntity<?> updatePedido(@RequestBody PedidoVentaModel model) {
+		try {
+			PedidoVentaModel pedido = service.update(model);
+			return ResponseEntity.ok(pedido);
+		} catch (Exception e) {
+			Map<String, String> response = new HashMap<>();
+			response.put("error", "Error al actualizar el pedido: " + e.getMessage());
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
 	
 	@PostMapping("/create-stock")
 	public ResponseEntity<?> createWithStock(@RequestBody PedidoVentaModel model) {

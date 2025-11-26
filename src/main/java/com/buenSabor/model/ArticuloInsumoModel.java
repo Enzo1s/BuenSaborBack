@@ -11,9 +11,9 @@ public class ArticuloInsumoModel {
 	
 	private String denominacion;
 	
-	private double precioCompra;
-	
-	private double precioVenta;
+	private Double precioCompra;
+
+	private Double precioVenta;
 	
 	private boolean esParaElaborar;
 	

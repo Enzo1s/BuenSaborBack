@@ -57,25 +57,69 @@ public class DatosMercadoPagoService extends
 	}
 
 	@Transactional
-	public String createPreference(String idPedidoVenta) throws MPException, MPApiException 
+	public String createPreference(String idPedidoVenta) throws MPException, MPApiException
 	{
 		Optional<PedidoVenta> pedidoVenta = pedidoVentaRepository.findById(idPedidoVenta);
 		if (pedidoVenta.isPresent()) {
-			List<PreferenceItemRequest> items = new ArrayList<>();
-			for (PedidoVentaDetalle detalle : pedidoVenta.get().getPedidoVentaDetalle()) {
-				PreferenceItemRequest itemRequest = PreferenceItemRequest.builder().id(detalle.getId())
-						.title(detalle.getArticuloInsumo() != null ? detalle.getArticuloInsumo().getDenominacion()
-								: detalle.getArticuloManufacturado().getDenominacion())
+			// Check if there's a discount applied to the pedido
+			PedidoVenta pedido = pedidoVenta.get();
 
-						.categoryId(detalle.getArticuloInsumo() != null ? "Insumo" : "Manufacturado")
-						.quantity((int) detalle.getCantidad()).currencyId("ARS")
-						.unitPrice(new BigDecimal(
-								detalle.getArticuloInsumo() != null ? detalle.getArticuloInsumo().getPrecioVenta()
-										: detalle.getArticuloManufacturado().getPrecioVenta()))
+			List<PreferenceItemRequest> items = new ArrayList<>();
+
+			// If there's a discount and total is available, create a single item with the discounted total
+			// Otherwise, create items individually as before
+			if (pedido.getDescuento() != null && pedido.getDescuento().compareTo(BigDecimal.ZERO) > 0
+				&& pedido.getTotal() != null) {
+				// Create a single item representing the entire order with discount applied
+				PreferenceItemRequest orderItem = PreferenceItemRequest.builder()
+						.id(pedido.getId())
+						.title("Pedido Total con Descuento Aplicado")
+						.categoryId("Pedido")
+						.quantity(1)
+						.currencyId("ARS")
+						.unitPrice(pedido.getTotal()) // getTotal() already returns a BigDecimal
 						.build();
-				items.add(itemRequest);
+				items.add(orderItem);
+			} else if (pedido.getTotal() != null) {
+				// If there's no discount but total is available, use the total
+				PreferenceItemRequest orderItem = PreferenceItemRequest.builder()
+						.id(pedido.getId())
+						.title("Pedido Total")
+						.categoryId("Pedido")
+						.quantity(1)
+						.currencyId("ARS")
+						.unitPrice(pedido.getTotal()) // getTotal() already returns a BigDecimal
+						.build();
+				items.add(orderItem);
+			} else {
+				// Original approach - individual items at their original prices (fallback)
+				for (PedidoVentaDetalle detalle : pedido.getPedidoVentaDetalle()) {
+					// Check if the detalle has articuloInsumo or articuloManufacturado first
+					// and ensure precios are not null before creating items
+					if (detalle.getArticuloInsumo() != null && detalle.getArticuloInsumo().getPrecioVenta() != null) {
+						PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+								.id(detalle.getArticuloInsumo().getId())
+								.title(detalle.getArticuloInsumo().getDenominacion())
+								.categoryId("Insumo")
+								.quantity((int) detalle.getCantidad())
+								.currencyId("ARS")
+								.unitPrice(BigDecimal.valueOf(detalle.getArticuloInsumo().getPrecioVenta()))
+								.build();
+						items.add(itemRequest);
+					} else if (detalle.getArticuloManufacturado() != null && detalle.getArticuloManufacturado().getPrecioVenta() != null) {
+						PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+								.id(detalle.getArticuloManufacturado().getId())
+								.title(detalle.getArticuloManufacturado().getDenominacion())
+								.categoryId("Manufacturado")
+								.quantity((int) detalle.getCantidad())
+								.currencyId("ARS")
+								.unitPrice(BigDecimal.valueOf(detalle.getArticuloManufacturado().getPrecioVenta()))
+								.build();
+						items.add(itemRequest);
+					}
+				}
 			}
-			
+
 			PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder().
 																		   success(getUrl()).
 																		   pending(getUrl()).
@@ -88,20 +132,20 @@ public class DatosMercadoPagoService extends
 																	autoReturn("all").
 																	externalReference(idPedidoVenta).
 																	build();
-			
-			try 
+
+			try
 			{
 				PreferenceClient client = new PreferenceClient();
 				Preference preference = client.create(preferenceRequest);
 				return preference.getId();
 
-			} catch (MPApiException e) 
+			} catch (MPApiException e)
 			{
 				System.out.println("Error status: " + e.getApiResponse().getStatusCode());
 				System.out.println("Error content: " + e.getApiResponse().getContent());
 				e.printStackTrace();
 			}
-			facturaVentaService.nuevaFactura(pedidoVentaConverter.entidadToModeloRes(pedidoVenta.get()));
+			facturaVentaService.nuevaFactura(pedidoVentaConverter.entidadToModeloRes(pedido));
 		}
 		return null;
 	}
@@ -124,7 +168,7 @@ public class DatosMercadoPagoService extends
 		datosMP.setMerchantAccountId(request.getMerchantAccountId());
 		datosMP.setDateCreated(LocalDate.now());
 
-		if(request.getStatus() == "approved") datosMP.setDateApproved(LocalDate.now());
+		if("approved".equals(request.getStatus())) datosMP.setDateApproved(LocalDate.now());
 
 		DatosMercadoPago datosMPSaved = repository.save(datosMP);
 

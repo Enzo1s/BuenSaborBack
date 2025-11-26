@@ -27,9 +27,9 @@ public class ArticuloInsumo extends ABM implements Serializable {
 	
 	private String denominacion;
 	
-	private double precioCompra;
-	
-	private double precioVenta;
+	private Double precioCompra;
+
+	private Double precioVenta;
 	
 	private boolean esParaElaborar;
 	

@@ -26,8 +26,8 @@ public class ArticuloManufacturado extends ABM implements Serializable {
 	private String id;
 	private String denominacion;
 	private String descripcion;
-	private double precioVenta;
-	private double precioCosto;
+	private Double precioVenta;
+	private Double precioCosto;
 	private Integer tiempoEstimado;
 	
 	@ManyToOne

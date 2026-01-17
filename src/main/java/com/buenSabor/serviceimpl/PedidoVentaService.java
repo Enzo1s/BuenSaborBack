@@ -124,10 +124,8 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 			}
 		}
 
-		// Clear any employee assignment from the frontend and apply our auto-assignment logic
-		model.setEmpleado(null); // Clear any employee sent from the frontend
+		model.setEmpleado(null);
 
-		// Assign the appropriate employee based on order content
 		Empleado empleadoAsignado = determinarEmpleadoPorContenidoOrden(model);
 		if (empleadoAsignado != null) {
 			model.setEmpleado(empleadoConverter.entidadToModeloRes(empleadoAsignado));
@@ -192,10 +190,8 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 				}
 			}
 
-			// Clear any employee assignment from the frontend and apply our auto-assignment logic
-			model.setEmpleado(null); // Clear any employee sent from the frontend
+			model.setEmpleado(null);
 
-			// Assign the appropriate employee based on order content
 			Empleado empleadoAsignado = determinarEmpleadoPorContenidoOrden(model);
 			if (empleadoAsignado != null) {
 				model.setEmpleado(empleadoConverter.entidadToModeloRes(empleadoAsignado));
@@ -235,42 +231,33 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
     }
 
     private Empleado determinarEmpleadoPorContenidoOrden(PedidoVentaModel model) {
-        // Obtener el empleado autenticado actualmente
         Empleado empleadoAutenticado = obtenerEmpleadoAutenticado();
 
-        // Si hay un empleado autenticado y su cargo es el adecuado para el pedido, se lo asignamos
         if (empleadoAutenticado != null) {
             if (contieneArticulosManufacturados(model)) {
-                // Si el pedido contiene artículos manufacturados, verificar que el empleado sea cocinero
                 if (empleadoAutenticado.getCargo() == Cargo.COCINERO) {
                     return empleadoAutenticado;
                 }
             } else {
-                // Si solo contiene insumos, verificar que el empleado sea cajero
                 if (empleadoAutenticado.getCargo() == Cargo.CAJERO) {
                     return empleadoAutenticado;
                 }
             }
         }
 
-        // Si el empleado no tiene el cargo adecuado o no hay empleado autenticado
-        // (por ejemplo, si es un cliente, admin o delivery), asignar al primer
-        // empleado disponible del tipo correcto
         if (contieneArticulosManufacturados(model)) {
-            // Buscar un cocinero disponible
             List<Empleado> cocineros = empleadoRepository.findByCargo(Cargo.COCINERO);
             if (!cocineros.isEmpty()) {
-                return cocineros.get(0); // Retorna el primer cocinero disponible
+                return cocineros.get(0);
             }
         } else {
-            // Si solo contiene insumos, buscar un cajero
             List<Empleado> cajeros = empleadoRepository.findByCargo(Cargo.CAJERO);
             if (!cajeros.isEmpty()) {
-                return cajeros.get(0); // Retorna el primer cajero disponible
+                return cajeros.get(0);
             }
         }
 
-        return null; // No hay empleados disponibles del tipo adecuado
+        return null;
     }
 
     private Empleado obtenerEmpleadoAutenticado() {
@@ -279,16 +266,14 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
         if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
             String username = authentication.getName();
 
-            // Obtener el usuario desde la base de datos
             Usuario usuarioAutenticado = jwtUtil.obtenerUsuario(username);
 
             if (usuarioAutenticado != null) {
-                // Buscar el empleado asociado con este usuario
                 Empleado empleado = empleadoRepository.findByUsuarioId(usuarioAutenticado.getId());
-                return empleado; // Retorna el empleado directamente o null si no existe
+                return empleado;
             }
         }
 
-        return null; // No hay empleado autenticado
+        return null;
     }
 }

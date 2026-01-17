@@ -20,6 +20,7 @@ import com.buenSabor.entity.SucursalInsumo;
 import com.buenSabor.enums.Cargo;
 import com.buenSabor.enums.Estado;
 import com.buenSabor.enums.FormaPago;
+import com.buenSabor.enums.TipoEnvio;
 import com.buenSabor.exeptions.StockException;
 import com.buenSabor.model.ArticuloManufacturadoDetalleModel;
 import com.buenSabor.model.FacturaVentaDetalleModel;
@@ -83,6 +84,29 @@ CommonConverter<PedidoVentaModel,PedidoVenta>, CommonRepository<PedidoVenta,Stri
 		Optional<PedidoVenta> entidad = repository.findById(id);
 		if(entidad.isPresent()) {
 			PedidoVenta pedido = entidad.get();
+
+			Estado estadoAnterior = pedido.getEstado();
+
+			// Asignar automáticamente al personal adecuado si el estado cambia a ENTREGADO
+			// y era diferente de ENTREGADO anteriormente
+			if(estado == Estado.ENTREGADO && estadoAnterior != Estado.ENTREGADO) {
+				// Buscar un empleado disponible según el tipo de envío
+				if(pedido.getTipoEnvio() != null && pedido.getTipoEnvio() == TipoEnvio.DELIVERY) {
+					// Asignar a delivery si el tipo de envío es DELIVERY
+					List<Empleado> deliveries = empleadoRepository.findByCargo(Cargo.DELIVERY);
+					if(!deliveries.isEmpty()) {
+						pedido.setEmpleado(deliveries.get(0)); // Asigna al primer delivery disponible
+					}
+				} else {
+					// Asignar a cajero para otros tipos de envío (TAKE_AWAY, etc.)
+					// ya que en estos casos el pedido terminado se relaciona con el cajero
+					List<Empleado> cajeros = empleadoRepository.findByCargo(Cargo.CAJERO);
+					if(!cajeros.isEmpty()) {
+						pedido.setEmpleado(cajeros.get(0)); // Asigna al primer cajero disponible
+					}
+				}
+			}
+
 			pedido.setEstado(estado);
 			return converter.entidadToModeloRes(repository.save(pedido));
 		}

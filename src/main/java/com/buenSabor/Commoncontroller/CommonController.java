@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.buenSabor.commonservice.CommonService;
 
-@CrossOrigin(origins = "*")
 public class CommonController<M, S extends CommonService<M>> {
 	
 	@Autowired
@@ -52,7 +51,17 @@ public class CommonController<M, S extends CommonService<M>> {
 	@PutMapping("/update")
 	public ResponseEntity<?> update( @RequestBody M model) {
 		M entityDb = service.save(model);
-		return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
+		return ResponseEntity.status(HttpStatus.OK).body(entityDb);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateById(@PathVariable String id, @RequestBody M model) {
+		M existingEntity = service.findById(id);
+		if(existingEntity == null) {
+			return ResponseEntity.notFound().build();
+		}
+		M entityDb = service.save(model);
+		return ResponseEntity.ok(entityDb);
 	}
 	
 	@DeleteMapping("/{id}")

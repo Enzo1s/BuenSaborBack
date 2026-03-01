@@ -45,10 +45,10 @@ public class GuardarArchivos {
                 String base64Data = parts[1];
 
                 byte[] imageData = Base64.getDecoder().decode(base64Data);
-                String nombreArchivo = UUID.randomUUID().toString() + ".png"; 
+                String nombreArchivo = UUID.randomUUID().toString() + ".png";
                 Path rutaArchivo = directorioGuardado.resolve(nombreArchivo);
                 Files.write(rutaArchivo, imageData);
-                rutas.add(rutaArchivo.toUri().getPath());
+                rutas.add(nombreArchivo);
 
             } catch (IllegalArgumentException e) {
                 System.err.println("Error al decodificar base64 para una imagen: " + e.getMessage());

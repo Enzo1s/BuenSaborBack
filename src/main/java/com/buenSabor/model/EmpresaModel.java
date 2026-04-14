@@ -11,7 +11,7 @@ public class EmpresaModel {
 	private String id;
 	private String nombre;
 	private String razonSocial;
-	private int cuil;
+	private long cuil;
 
 	private List<SucursalEmpresaModel> sucursalEmpresa;
 	

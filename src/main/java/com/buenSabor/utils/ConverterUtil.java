@@ -3,6 +3,7 @@ package com.buenSabor.utils;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,11 @@ public class ConverterUtil {
 
 	public ConverterUtil() {
 		this.modelMapper = new ModelMapper();
+		// Configure ModelMapper to use strict matching and avoid ambiguous mappings
+		this.modelMapper.getConfiguration()
+			.setMatchingStrategy(MatchingStrategies.STRICT)
+			.setSkipNullEnabled(true)
+			.setAmbiguityIgnored(true);
 	}
 
 	public <E, M> List<M> convertToModel(List<E> entity, Class<M> model) {

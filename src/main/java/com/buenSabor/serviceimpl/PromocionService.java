@@ -2,9 +2,12 @@ package com.buenSabor.serviceimpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ import com.buenSabor.entity.Promocion;
 import com.buenSabor.exeptions.PromocionException;
 import com.buenSabor.model.PromocionModel;
 import com.buenSabor.repository.PromocionRepository;
+import com.buenSabor.utils.GuardarArchivos;
 
 @Service
 public class PromocionService extends CommonServiceImpl<Promocion, PromocionModel,
@@ -22,6 +26,9 @@ CommonConverter<PromocionModel,Promocion>, CommonRepository<Promocion,String>>{
 
     @Autowired
     private PromocionRepository promocionRepository;
+
+    @Autowired
+    private GuardarArchivos guardarArchivos;
 
     @Override
     @Transactional
@@ -31,7 +38,13 @@ CommonConverter<PromocionModel,Promocion>, CommonRepository<Promocion,String>>{
         } catch (PromocionException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return super.save(model);
+
+        Promocion entidad = converter.modeloReqToEntidad(model);
+        if(model.getPathImagen() != null && !model.getPathImagen().isEmpty()) {
+            entidad.setPathImagen(guardarArchivos.guardarImgenes(model.getPathImagen()));
+        }
+        entidad = repository.save(entidad);
+        return converter.entidadToModeloRes(entidad);
     }
 
     @Override
@@ -42,7 +55,22 @@ CommonConverter<PromocionModel,Promocion>, CommonRepository<Promocion,String>>{
         } catch (PromocionException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return super.update(model);
+
+        Promocion entidad = converter.modeloReqToEntidad(model);
+        if(model.getPathImagen() != null && !model.getPathImagen().isEmpty()) {
+            entidad.setPathImagen(guardarArchivos.guardarImgenes(model.getPathImagen()));
+        }
+        entidad = repository.save(entidad);
+        return converter.entidadToModeloRes(entidad);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PromocionModel findById(String id) {
+        Optional<Promocion> obj = promocionRepository.findByIdWithPathImagen(id);
+        if (obj.isPresent())
+            return converter.entidadToModeloRes(obj.get());
+        return null;
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +80,10 @@ CommonConverter<PromocionModel,Promocion>, CommonRepository<Promocion,String>>{
         return activePromotions.stream()
                 .map(promocion -> converter.entidadToModeloRes(promocion))
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<Resource> abrirArchivo(String archivo) {
+        return guardarArchivos.leerArchivo(archivo);
     }
 
     private void validatePromotion(PromocionModel model) throws PromocionException {

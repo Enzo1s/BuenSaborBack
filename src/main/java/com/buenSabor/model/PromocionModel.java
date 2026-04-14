@@ -7,19 +7,21 @@ import lombok.Data;
 
 @Data
 public class PromocionModel {
-	
+
 	private String id;
-	
+
 	private String denominacion;
 
 	private LocalDateTime fechaDesde;
-	
+
 	private LocalDateTime fechaHasta;
-	
+
 	private double descuento;
-	
+
+	private List<String> pathImagen;
+
 	private List<PromocionDetalleModel> promocionDetalle;
-	
+
 	private LocalDateTime modificacion;
 
 	private LocalDateTime alta;

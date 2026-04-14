@@ -296,6 +296,13 @@ CREATE TABLE `promocion_promocion_detalle` (
   CONSTRAINT `FKdartjme6f5y4qa9desfh07u7t` FOREIGN KEY (`promocion_detalle_id`) REFERENCES `promocion_detalle` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `promocion_path_imagen` (
+  `promocion_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `path_imagen` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  KEY `FKpromocion_path_imagen` (`promocion_id`),
+  CONSTRAINT `FKpromocion_path_imagen` FOREIGN KEY (`promocion_id`) REFERENCES `promocion` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 -- =========================================================================
 -- MÓDULO 4: OPERACIONES Y VENTAS
